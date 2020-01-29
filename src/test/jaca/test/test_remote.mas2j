@@ -1,0 +1,10 @@
+MAS remoteTest {
+
+    environment: jaca.CartagoEnvironment("remote","default","localhost")
+
+    agents:  
+    myagent agentArchClass jaca.CAgentArch;
+
+    aslSourcePath: "src/test";
+
+}

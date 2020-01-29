@@ -1,0 +1,11 @@
+MAS fulltest {
+
+    environment: jaca.CartagoEnvironment("infrastructure", service(rmi), protocol(rmi))
+
+    agents:  
+        server_agent agentArchClass jaca.CAgentArch;
+    
+    aslSourcePath: "src/test";
+    
+
+}
