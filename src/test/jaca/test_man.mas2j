@@ -1,9 +1,0 @@
-MAS test_man {
-
-    environment: jaca.CartagoEnvironment
-
-    agents:  
-        manuser agentArchClass jaca.CAgentArch #1;
-
-    aslSourcePath: "src/test";
-}

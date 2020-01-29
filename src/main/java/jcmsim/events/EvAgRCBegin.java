@@ -8,25 +8,25 @@ import jcmsim.activities.ActAgRC;
 
 public class EvAgRCBegin extends EvCtxEvent {
 
-	private long numCycle;
-	
-	public EvAgRCBegin(long numCycle) {
-		this.numCycle = numCycle;
-	}
-	
-	public long getNumCycle() {
-		return numCycle;
-	}
-	
+    private long numCycle;
+    
+    public EvAgRCBegin(long numCycle) {
+        this.numCycle = numCycle;
+    }
+    
+    public long getNumCycle() {
+        return numCycle;
+    }
+    
     public Optional<EvCtxActivity> getActivityToBegin() {
-    	return Optional.of(new ActAgRC(this));
+        return Optional.of(new ActAgRC(this));
     }
 
     public boolean isActivityEnd() {
-    	return true;
+        return true;
     }
 
     public String toString() {
-    	return "[event: reasoning cycle begin | num-cycle: " + numCycle + " ]";
+        return "[event: reasoning cycle begin | num-cycle: " + numCycle + " ]";
     }
 }

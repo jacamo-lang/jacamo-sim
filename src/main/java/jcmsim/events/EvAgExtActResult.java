@@ -6,10 +6,10 @@ import jcmsim.EvCtxEvent;
 
 public class EvAgExtActResult extends EvCtxEvent {
     
-	private CartagoActionEvent ev;
-	
+    private CartagoActionEvent ev;
+    
     public EvAgExtActResult(CartagoActionEvent ev) {
-    	this.ev = ev;
+        this.ev = ev;
     }
     
     public CartagoActionEvent getActionEvent() {
@@ -17,11 +17,11 @@ public class EvAgExtActResult extends EvCtxEvent {
     }
     
     public boolean isActivityEnd() {
-    	return true;
+        return true;
     }
     
     public String toString() {
-    	return "[event: ext action result | act-id: " + ev.getActionId() + " | " + (ev instanceof ActionSucceededEvent ? "success" : "failure") + " ]";  
+        return "[event: ext action result | act-id: " + ev.getActionId() + " | " + (ev instanceof ActionSucceededEvent ? "success" : "failure") + " ]";  
     }
              
 }

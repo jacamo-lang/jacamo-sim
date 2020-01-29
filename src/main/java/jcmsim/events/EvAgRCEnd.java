@@ -9,26 +9,26 @@ import jcmsim.activities.ActAgRC;
 
 public class EvAgRCEnd extends EvCtxEvent {
 
-	private long numCycle;
-	
-	public EvAgRCEnd(long numCycle) {
-		this.numCycle = numCycle;
-	}
-	
-	public long getNumCycle() {
-		return numCycle;
-	}
-	
+    private long numCycle;
+    
+    public EvAgRCEnd(long numCycle) {
+        this.numCycle = numCycle;
+    }
+    
+    public long getNumCycle() {
+        return numCycle;
+    }
+    
     public boolean isActivityEnd() {
-    	return true;
+        return true;
     }
 
     public Optional<EvCtxActivity> getActivityToBegin() {
-    	return Optional.of(new ActAgBetweenRC(this));
+        return Optional.of(new ActAgBetweenRC(this));
     }
     
     public String toString() {
-    	return "[event: reasoning cycle end | num-cycle: " + numCycle + " ]";
+        return "[event: reasoning cycle end | num-cycle: " + numCycle + " ]";
     }
     
 }

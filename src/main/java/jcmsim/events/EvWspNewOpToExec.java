@@ -22,34 +22,34 @@ public class EvWspNewOpToExec extends EvCtxEvent {
     }
         
     public long getActionId() {
-    	return actionId;
+        return actionId;
     }
     
     public boolean isActivityEnd() {
-    	return true;
+        return true;
     }
     
-	public AgentId getUserId() {
-		return userId;
-	}
+    public AgentId getUserId() {
+        return userId;
+    }
 
-	public ArtifactId getArId() {
-		return arId;
-	}
+    public ArtifactId getArId() {
+        return arId;
+    }
 
-	public String getArName() {
-		return arName;
-	}
+    public String getArName() {
+        return arName;
+    }
 
-	public Op getOp() {
-		return op;
-	}
-	
+    public Op getOp() {
+        return op;
+    }
+    
     public String toString() {
-    	return "[event: wsp new op to exec | act-id: " + actionId + " | " + op.getName() + " on " + (arName != null ? arName : arId) + " by " + userId.getAgentName() + "]";
+        return "[event: wsp new op to exec | act-id: " + actionId + " | " + op.getName() + " on " + (arName != null ? arName : arId) + " by " + userId.getAgentName() + "]";
         
     }
 
-	
+    
          
 }

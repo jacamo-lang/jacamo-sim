@@ -219,7 +219,7 @@ public class CentralisedAgArch extends AgArch implements Runnable {
 
     protected void reasoningCycle() {
 
-    	/* @SIMU */
+        /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
         
         long num = getUserAgArch().getCycleNumber();

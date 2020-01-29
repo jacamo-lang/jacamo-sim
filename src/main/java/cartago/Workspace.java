@@ -112,7 +112,7 @@ public class Workspace {
         /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
         contr.createNewTContext(id.getName(), EvCtxType.WORKSPACE, System.currentTimeMillis());
-    	
+        
         this.id = id;
         this.desc = desc;
         
@@ -1005,13 +1005,13 @@ public class Workspace {
 
     private void execOp(long actionId, AgentId userId, ICartagoCallback ctx, ArtifactId arId, String arName, Op op, long timeout, IAlignmentTest test) /* throws CartagoException */ {
         
-    	/*
-    	 * @SIMU
-    	 */
-    	SimulationController contr = SimulationController.getSimulationController();
-	    contr.notifyNewEvent(this.id.toString(), new EvWspNewOpToExec(actionId, userId, arId, arName, op));
-    	
-    	
+        /*
+         * @SIMU
+         */
+        SimulationController contr = SimulationController.getSimulationController();
+        contr.notifyNewEvent(this.id.toString(), new EvWspNewOpToExec(actionId, userId, arId, arName, op));
+        
+        
         if (isShutdown){
             notifyFailure(ctx, arId, actionId, op, "Workspace shutdown", new Tuple("wsp_shutdown", this.getId().getName()));
             return;

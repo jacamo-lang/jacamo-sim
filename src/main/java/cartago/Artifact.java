@@ -327,14 +327,14 @@ public abstract class Artifact {
      */
     private void doOperation(OpExecutionFrame info) throws CartagoException {
         
-    	/*
-    	 * @SIMU
-    	 */
-    	SimulationController contr = SimulationController.getSimulationController();
-	    contr.notifyNewEvent(this.id.toString(), new EvArtOpExecBegin(this.id, info));
-    	
-    	
-    	ICartagoLoggerManager log = wsp.getLoggerManager();
+        /*
+         * @SIMU
+         */
+        SimulationController contr = SimulationController.getSimulationController();
+        contr.notifyNewEvent(this.id.toString(), new EvArtOpExecBegin(this.id, info));
+        
+        
+        ICartagoLoggerManager log = wsp.getLoggerManager();
         try {
             lock.lock();
             Op op = info.getOperation();

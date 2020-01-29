@@ -1,9 +1,0 @@
-MAS fulltest {
-
-    environment: jaca.CartagoEnvironment("infrastructure", service(rmi,"localhost:9095"))
-
-    agents:  
-        client_agent agentArchClass jaca.CAgentArch;
-
-    aslSourcePath: "src/test";
-}

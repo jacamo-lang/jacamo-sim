@@ -16,11 +16,11 @@ public class EvAgBBUpdatedFromPercept extends EvCtxEvent {
     }
     
     public boolean isActivityEnd() {
-    	return true;
+        return true;
     }
     
     public String toString() {
-    	return "[event: BB updated with obs state event | percept " + ev.getId() + " from " + ev.getArtifactId() + "]";
+        return "[event: BB updated with obs state event | percept " + ev.getId() + " from " + ev.getArtifactId() + "]";
         
     }
 }

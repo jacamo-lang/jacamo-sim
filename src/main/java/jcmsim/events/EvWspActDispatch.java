@@ -24,7 +24,7 @@ public class EvWspActDispatch extends EvCtxEvent {
     }
     
     public String getWspName() {
-    	return wspName;
+        return wspName;
     }
     
     public Op getOp() {
@@ -32,28 +32,28 @@ public class EvWspActDispatch extends EvCtxEvent {
     }
 
     public String getArtifactId() {
-    	return aid;
+        return aid;
     }
     
     public long getActionId() {
-    	return actionId;
+        return actionId;
     }
     
     public Optional<EvCtxActivity> getActivityToBegin() {
-    	return Optional.of(new ActWspActOpDispatch(this));
+        return Optional.of(new ActWspActOpDispatch(this));
     }
     
     public EvAgExtActRequest getCausedByEvent() {
-    	return causedByEvent;
+        return causedByEvent;
     }
 
     
     public String toString() {
-    	if (aid != null) {
-    		return "[event: wsp ext action dispatch | act-id: " + actionId + " | " + op.getName() + " on " + aid + "]";
-    	} else {
-    		return "[event: wsp ext action dispatch | act-id: " + actionId + " | " + op.getName() +  "]";
-    	}
+        if (aid != null) {
+            return "[event: wsp ext action dispatch | act-id: " + actionId + " | " + op.getName() + " on " + aid + "]";
+        } else {
+            return "[event: wsp ext action dispatch | act-id: " + actionId + " | " + op.getName() +  "]";
+        }
         
     }
          

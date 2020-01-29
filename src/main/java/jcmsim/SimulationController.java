@@ -29,7 +29,7 @@ public class SimulationController {
     }
 
     public Collection<EvCtx> getContexts(){
-    	return tcontexts.values();
+        return tcontexts.values();
     }
     
     private SimulationController() {
@@ -37,13 +37,13 @@ public class SimulationController {
         sim = new Simulation();
         view = new SimulationView();
         
-        if (sim.isTrackingMode()) {             	
-        	logger = new SimulationLogger(this, view);
-        	logger.start();
+        if (sim.isTrackingMode()) {                 
+            logger = new SimulationLogger(this, view);
+            logger.start();
       
         } else {
-	        frame = new SimuFrame();
-	        frame.setVisible(true);
+            frame = new SimuFrame();
+            frame.setVisible(true);
         }
     }
     
@@ -55,30 +55,30 @@ public class SimulationController {
     public EvCtxEvent getLastEvent(String ctxId) {
         EvCtx ctx = tcontexts.get(ctxId);
         if (ctx != null ) {
-        	List<EvCtxEvent> h = ctx.getEventHistory();
-        	if (!h.isEmpty()) {
-        		return h.get(h.size() - 1);
-        	}
+            List<EvCtxEvent> h = ctx.getEventHistory();
+            if (!h.isEmpty()) {
+                return h.get(h.size() - 1);
+            }
         }
-        return null;    	
+        return null;        
     }
     
     public List<EvCtxEvent> getEventHistory(String ctxId) {
         EvCtx ctx = tcontexts.get(ctxId);
         if (ctx != null ) {
-        	return ctx.getEventHistory();
+            return ctx.getEventHistory();
         }
-        return null;    	
+        return null;        
     }
 
     public void notifyNewEvent(String ctxId, EvCtxEvent ev) {
         EvCtx ctx = tcontexts.get(ctxId);
         if (ctx != null) {
-        	ctx.notifyNewEvent(ev);
+            ctx.notifyNewEvent(ev);
         
-	        if (!sim.isTrackingMode()) {
-	        	frame.next(ev.toString());  
-	        }
+            if (!sim.isTrackingMode()) {
+                frame.next(ev.toString());  
+            }
         }
     }
     

@@ -18,8 +18,8 @@ public class EvCtx {
     private EvCtxType type;
     
     public EvCtx(String id, EvCtxType type, long startTime, Simulation sim) {
-    	this.id = id;
-    	this.type = type;
+        this.id = id;
+        this.type = type;
         this.currentTime = startTime;
         this.sim = sim;
         eventHistory = new ArrayList<EvCtxEvent>();
@@ -27,11 +27,11 @@ public class EvCtx {
     }
 
     public String getId() {
-    	return id;
+        return id;
     }
 
     public EvCtxType getType() {
-    	return type;
+        return type;
     }
     
     public void addActivity(EvCtxActivity act) {
@@ -43,19 +43,19 @@ public class EvCtx {
     }
  
     public synchronized List<EvCtxEvent> getEventHistory(){
-    	ArrayList<EvCtxEvent> h = new ArrayList<EvCtxEvent>();
-    	for (EvCtxEvent ev: eventHistory) {
-    		h.add(ev);
-    	}
-    	return h;
+        ArrayList<EvCtxEvent> h = new ArrayList<EvCtxEvent>();
+        for (EvCtxEvent ev: eventHistory) {
+            h.add(ev);
+        }
+        return h;
     }
 
     public synchronized List<EvCtxActivity> getActivityHistory(){
-    	ArrayList<EvCtxActivity> h = new ArrayList<EvCtxActivity>();
-    	for (EvCtxActivity a: activityHistory) {
-    		h.add(a);
-    	}
-    	return h;
+        ArrayList<EvCtxActivity> h = new ArrayList<EvCtxActivity>();
+        for (EvCtxActivity a: activityHistory) {
+            h.add(a);
+        }
+        return h;
     }
     
     public synchronized void notifyNewEvent(EvCtxEvent ev) {
@@ -64,46 +64,46 @@ public class EvCtx {
 
         Optional<EvCtxActivity> _act = ev.getActivityToBegin();
         if (_act.isPresent()) {
-        	activityHistory.add(_act.get());
+            activityHistory.add(_act.get());
         }
 
         if (sim.isTrackingMode()) {
-    		currentTime = System.currentTimeMillis();
-    		ev.setTime(currentTime);
-    		
-        	if (ev.isActivityEnd()) {
-    	        for (EvCtxActivity act: activityHistory) {
-    	        	if (act.isPending()) {
-    	        		if (act.checkAndAppyCompletion(ev)) {
-    	        			act.setEndEvent(ev);
-    	        			break;
-    	        		}
-    	        	}
-    	        }
+            currentTime = System.currentTimeMillis();
+            ev.setTime(currentTime);
+            
+            if (ev.isActivityEnd()) {
+                for (EvCtxActivity act: activityHistory) {
+                    if (act.isPending()) {
+                        if (act.checkAndAppyCompletion(ev)) {
+                            act.setEndEvent(ev);
+                            break;
+                        }
+                    }
+                }
             }
-    	} else {
-    	
-	    	/* 
-	    	 * if the event is the end of an activity
-	    	 * the duration maybe computed by a function
-	    	 * that depends on the type of activity..
-	    	 */
-	    	if (ev.isActivityEnd()) {
-	            for (EvCtxActivity act: activityHistory) {
-		        	if (act.isPending()) {
-		        		if (act.checkAndAppyCompletion(ev)) {
-		        			act.setEndEvent(ev);	        			
-		        			long dur = sim.getDuration(act);
-		        			ev.setTime(act.getBeginEvent().getTime() + dur);
-		        			break;
-		        		}
-		        	}
-		        }
-	        } else {
-	        	/* sporadic, simu mode */
-	        	ev.setTime(currentTime);        
-	        } 
-    	}
+        } else {
+        
+            /* 
+             * if the event is the end of an activity
+             * the duration maybe computed by a function
+             * that depends on the type of activity..
+             */
+            if (ev.isActivityEnd()) {
+                for (EvCtxActivity act: activityHistory) {
+                    if (act.isPending()) {
+                        if (act.checkAndAppyCompletion(ev)) {
+                            act.setEndEvent(ev);                        
+                            long dur = sim.getDuration(act);
+                            ev.setTime(act.getBeginEvent().getTime() + dur);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                /* sporadic, simu mode */
+                ev.setTime(currentTime);        
+            } 
+        }
 
     }
         

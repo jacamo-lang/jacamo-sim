@@ -69,13 +69,13 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         synchronized (this){
             ctx = contexts.get(aid.getWorkspaceId());
             if (ctx != null) {
-            	
-            	/* @SIMU */
+                
+                /* @SIMU */
                 SimulationController contr = SimulationController.getSimulationController();
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(aid.getWorkspaceId().getName(), actId, aid.getName(), op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(aid.getWorkspaceId().getName(), evc);	            
+                contr.notifyNewEvent(aid.getWorkspaceId().getName(), evc);              
 
                 ctx.doAction(actId, aid.getName(), op, test, timeout);
                 return actId;
@@ -93,14 +93,14 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
             ctx = contexts.get(wspId);
             if (ctx != null) {
 
-            	/* @SIMU */
+                /* @SIMU */
                 SimulationController contr = SimulationController.getSimulationController();
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspId.getName(), actId, artName, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspId.getName(), evc);	            
-            	
-            	ctx.doAction(actId, artName, op, test, timeout);
+                contr.notifyNewEvent(wspId.getName(), evc);             
+                
+                ctx.doAction(actId, artName, op, test, timeout);
                 return actId;
             } else {
                 throw new CartagoException("Wrong workspace.");
@@ -120,14 +120,14 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
                 }
             }
             if (ctx != null) {
-            	
-            	/* @SIMU */
+                
+                /* @SIMU */
                 SimulationController contr = SimulationController.getSimulationController();
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspName, actId, artName, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspName, evc);	            
-            	
+                contr.notifyNewEvent(wspName, evc);             
+                
                 ctx.doAction(actId, artName, op, test, timeout);
                 return actId;
             } else {
@@ -142,14 +142,14 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         synchronized (this){
             ctx = contexts.get(wspId);
             if (ctx != null) {
-            	
-            	/* @SIMU */
+                
+                /* @SIMU */
                 SimulationController contr = SimulationController.getSimulationController();
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspId.getName(), actId, null, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspId.getName(), evc);	            
-            	
+                contr.notifyNewEvent(wspId.getName(), evc);             
+                
                 ctx.doAction(actId, op, test, timeout);
                 return actId;
             } else {
@@ -171,14 +171,14 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
             }
             if (ctx != null) {
 
-            	/* @SIMU */
+                /* @SIMU */
                 SimulationController contr = SimulationController.getSimulationController();
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspName, actId, null, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspName, evc);	            
+                contr.notifyNewEvent(wspName, evc);             
 
-            	
+                
                 ctx.doAction(actId, op, test, timeout);
                 return actId;
             } else {
@@ -265,39 +265,39 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         // System.out.println("NOTIFIED "+ev.getId()+"
         // "+ev.getClass().getCanonicalName());
         
-    	SimulationController contr = SimulationController.getSimulationController();
-    	
+        SimulationController contr = SimulationController.getSimulationController();
+        
         if (ev instanceof CartagoActionEvent) {
-        	/* find the wsp from the artifact id */
-        	CartagoActionEvent ae = (CartagoActionEvent) ev;
-        	long actId = ae.getActionId();
-        	
-        	String agentName = this.credential.getId();
-        	List<EvCtxEvent> h = contr.getEventHistory(agentName);
+            /* find the wsp from the artifact id */
+            CartagoActionEvent ae = (CartagoActionEvent) ev;
+            long actId = ae.getActionId();
+            
+            String agentName = this.credential.getId();
+            List<EvCtxEvent> h = contr.getEventHistory(agentName);
 
-        	if (h != null) {
-	        	for (int i = h.size() - 1; i >= 0; i--) {
-	        		EvCtxEvent e = h.get(i);
-	        		if (e instanceof EvAgExtActRequest) {
-	        			EvAgExtActRequest req = (EvAgExtActRequest) e;
-	        			if (req.getCausedEvent().getActionId() == actId) {
-	        				EvWspActDispatch disp = req.getCausedEvent();
-	        	        	contr.notifyNewEvent(disp.getWspName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));       	        	
-	        	        	contr.notifyNewEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));       	        	
-	        				break;
-	        			}
-	        		}
-	        	}
-        	}
-        	
+            if (h != null) {
+                for (int i = h.size() - 1; i >= 0; i--) {
+                    EvCtxEvent e = h.get(i);
+                    if (e instanceof EvAgExtActRequest) {
+                        EvAgExtActRequest req = (EvAgExtActRequest) e;
+                        if (req.getCausedEvent().getActionId() == actId) {
+                            EvWspActDispatch disp = req.getCausedEvent();
+                            contr.notifyNewEvent(disp.getWspName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));                       
+                            contr.notifyNewEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));                    
+                            break;
+                        }
+                    }
+                }
+            }
+            
         } else if (ev instanceof ArtifactObsEvent) {
-        	/* find the wsp from the artifact id */
-        	ArtifactObsEvent oe = (ArtifactObsEvent) ev;
-        	contr.notifyNewEvent(oe.getArtifactId().getWorkspaceId().getName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));       	
-        	contr.notifyNewEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));       	        	
+            /* find the wsp from the artifact id */
+            ArtifactObsEvent oe = (ArtifactObsEvent) ev;
+            contr.notifyNewEvent(oe.getArtifactId().getWorkspaceId().getName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));           
+            contr.notifyNewEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));                    
         }
-    	
-    	checkWSPEvents(ev);
+        
+        checkWSPEvents(ev);
         boolean keepEvent = true;
         if (agentArchListener != null) {
             keepEvent = agentArchListener.notifyCartagoEvent(ev);

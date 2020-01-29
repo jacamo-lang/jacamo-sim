@@ -20,11 +20,11 @@ public class EvAgNewPerceptNotified extends EvCtxEvent {
     }
     
     public Optional<EvCtxActivity> getActivityToBegin() {
-    	return Optional.of(new ActAgPercToBel(this));
+        return Optional.of(new ActAgPercToBel(this));
     }
 
     public String toString() {
-    	return "[event: new percept notified | percept id: " + ev.getId() + " | " + ev.getClass().getName() + "]";
+        return "[event: new percept notified | percept id: " + ev.getId() + " | " + ev.getClass().getName() + "]";
         
     }
 }

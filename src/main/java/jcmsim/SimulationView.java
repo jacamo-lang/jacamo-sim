@@ -11,15 +11,15 @@ import javax.swing.SwingUtilities;
 
 public class SimulationView extends JFrame  {      
     
-	private SimuViewerFrame frame;
+    private SimuViewerFrame frame;
     
     public SimulationView(){
-    	frame = new SimuViewerFrame();
+        frame = new SimuViewerFrame();
         frame.setVisible(true);
     }
     
     public void update(String s){
-    	frame.update(s);
+        frame.update(s);
     }
     
     class SimuViewerFrame extends JFrame {
@@ -41,24 +41,24 @@ public class SimulationView extends JFrame  {
 
             JCheckBox cb = new JCheckBox("Don't refresh");  
             cb.addItemListener((ItemEvent e) -> {
-            	if (e.getStateChange() ==  java.awt.event.ItemEvent.SELECTED) {
-            		updateBlocked = true;
-            	} else {
-            		updateBlocked = false;
-            	}
+                if (e.getStateChange() ==  java.awt.event.ItemEvent.SELECTED) {
+                    updateBlocked = true;
+                } else {
+                    updateBlocked = false;
+                }
             });
             panel.add(cb);
             
             text.setEditable(false);
             panel.add(scrollPane);        
         }
-    	
+        
         public void update(String s){
-        	if (!updateBlocked) {
-	        	SwingUtilities.invokeLater(() -> {
-	                text.setText(s);
-	        	});
-        	}
+            if (!updateBlocked) {
+                SwingUtilities.invokeLater(() -> {
+                    text.setText(s);
+                });
+            }
         }
         
     }

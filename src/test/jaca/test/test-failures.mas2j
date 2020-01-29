@@ -1,9 +1,0 @@
-MAS test {
-
-    environment: jaca.CartagoEnvironment
-
-    agents:  
-    error_agent agentArchClass jaca.CAgentArch;
-
-    aslSourcePath: "src/test/jaca/test";
-}

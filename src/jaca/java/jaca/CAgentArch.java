@@ -140,7 +140,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
     
         /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(this.getAgName(), new EvAgExtActRequest((ActionExec) actionExec));	            
+        contr.notifyNewEvent(this.getAgName(), new EvAgExtActRequest((ActionExec) actionExec));             
 
 
         Structure action = actionExec.getActionTerm();
@@ -388,7 +388,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                 }
 
                 if (actId != Long.MIN_VALUE) {
-                	
+                    
                     PendingAction pa = new PendingAction(actId, action, (ActionExec) actionExec);
                     pendingActions.put(actId, pa);
                     // getLogger().info("Agent "+agName+" executed op: "+op.getName()+" on artifact "+aid);
@@ -451,18 +451,18 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
         if (envSession == null) // the init isn't finished yet...
             return super.perceive();
 
-    	SimulationController contr = SimulationController.getSimulationController();
+        SimulationController contr = SimulationController.getSimulationController();
 
-    	try {
+        try {
             CartagoEvent evt = envSession.fetchNextPercept();
 
             while (evt != null) {
 
-            	/* @SIMU */
-            	if (evt instanceof CartagoActionEvent) {
-    	        	contr.notifyNewEvent(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));       	        	
-            	}
-            	
+                /* @SIMU */
+                if (evt instanceof CartagoActionEvent) {
+                    contr.notifyNewEvent(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));                       
+                }
+                
                 if (evt instanceof ActionSucceededEvent) {
                     perceiveActionSucceeded((ActionSucceededEvent) evt);
                 } else if (evt instanceof ActionFailedEvent) {
@@ -478,7 +478,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                     perceiveAddedOP(ev);
                     perceiveRemovedOP(ev);
                     
-    	        	contr.notifyNewEvent(this.getAgName(), new jcmsim.events.EvAgBBUpdatedFromPercept(ev));       	        	
+                    contr.notifyNewEvent(this.getAgName(), new jcmsim.events.EvAgBBUpdatedFromPercept(ev));                     
 
                 } else if (evt instanceof ObsArtListChangedEvent) {
                     /* experimental */

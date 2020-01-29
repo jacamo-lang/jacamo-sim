@@ -66,12 +66,12 @@ public class EventRegistry {
 
     public ActionSucceededEvent makeActionSucceededEvent(long actionId, ArtifactId aid, Op op){
 
-    	/* @SIMU */
-    	if (aid != null) {   
-	        SimulationController contr = SimulationController.getSimulationController();
-	        contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-    	}        
-    	
+        /* @SIMU */
+        if (aid != null) {   
+            SimulationController contr = SimulationController.getSimulationController();
+            contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+        }        
+        
         long id = nextTimestamp.incrementAndGet();
         ActionSucceededEvent ev = new ActionSucceededEvent(id, actionId, op, aid);
         return ev;
@@ -89,12 +89,12 @@ public class EventRegistry {
 
     public FocusSucceededEvent makeFocusActionSucceededEvent(long actionId, ArtifactId aid, Op op, ArtifactId target, List<ArtifactObsProperty> props){
 
-    	if (aid != null) {
-	        SimulationController contr = SimulationController.getSimulationController();
-	        contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-    	}
-    	
-    	long id = nextTimestamp.incrementAndGet();
+        if (aid != null) {
+            SimulationController contr = SimulationController.getSimulationController();
+            contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+        }
+        
+        long id = nextTimestamp.incrementAndGet();
         FocusSucceededEvent ev = new FocusSucceededEvent(id, actionId, op, aid, target, props);
         return ev;
     }
@@ -111,11 +111,11 @@ public class EventRegistry {
 
     public JoinWSPSucceededEvent makeJoinWSPSucceededEvent(long actionId, ArtifactId aid, Op op, WorkspaceId wspId, ICartagoContext ctx) {
 
-    	if (aid != null) {
-	        SimulationController contr = SimulationController.getSimulationController();
-	        contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-    	}
-    	
+        if (aid != null) {
+            SimulationController contr = SimulationController.getSimulationController();
+            contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+        }
+        
         long id = nextTimestamp.incrementAndGet();
         JoinWSPSucceededEvent ev = new JoinWSPSucceededEvent(id, actionId, op, aid, wspId, ctx);
         return ev;

@@ -18,11 +18,11 @@ public abstract class EvCtxEvent {
     }
     
     public Optional<EvCtxActivity> getActivityToBegin() {
-    	return Optional.empty();
+        return Optional.empty();
     }
 
     public boolean isActivityEnd() {
-    	return false;
+        return false;
     }
 
 }
