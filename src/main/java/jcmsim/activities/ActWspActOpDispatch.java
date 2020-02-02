@@ -24,7 +24,12 @@ public class ActWspActOpDispatch extends ECActivity {
 
     public String toString() {
         EvWspNewOpToExec ev = (EvWspNewOpToExec) this.getEndEvent();
-        return "[activity: wsp action op dispatch | act-id: " + ev.getActionId() + " | " + ev.getOp().getName() + " on " +ev.getArId()  + " by " + ev.getUserId().getAgentName() +"]";
+        if (ev.getArId() != null) {
+        	return "[activity: wsp action op dispatch | act-id: " + ev.getActionId() + " | " + ev.getOp().getName() + " on " +ev.getArId()  + " by " + ev.getUserId().getAgentName() +"]";
+        } else if (ev.getArName() != null){
+        	return "[activity: wsp action op dispatch | act-id: " + ev.getActionId() + " | " + ev.getOp().getName() + " on " +ev.getArName()  + " by " + ev.getUserId().getAgentName() +"]";
+        } else {
+        	return "[activity: wsp action op dispatch | act-id: " + ev.getActionId() + " | " + ev.getOp().getName() + " by " + ev.getUserId().getAgentName() +"]";
+        }
     }
-
 }

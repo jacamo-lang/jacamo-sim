@@ -19,10 +19,6 @@ package cartago;
 
 import java.util.concurrent.atomic.AtomicLong;
 import cartago.events.*;
-import jcmsim.SimulationController;
-import jcmsim.events.EvArtOpExecEnd;
-import jcmsim.events.EvWspObsStateDispatch;
-import jcmsim.events.EvArtObsStateEvent;
 
 import java.util.*;
 
@@ -64,14 +60,7 @@ public class EventRegistry {
         return ev;
     }
 
-    public ActionSucceededEvent makeActionSucceededEvent(long actionId, ArtifactId aid, Op op){
-
-        /* @SIMU */
-        if (aid != null) {   
-            SimulationController contr = SimulationController.getSimulationController();
-            contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-        }        
-        
+    public ActionSucceededEvent makeActionSucceededEvent(long actionId, ArtifactId aid, Op op){        
         long id = nextTimestamp.incrementAndGet();
         ActionSucceededEvent ev = new ActionSucceededEvent(id, actionId, op, aid);
         return ev;
@@ -79,9 +68,6 @@ public class EventRegistry {
 
     public ActionFailedEvent makeActionFailedEvent(ArtifactId aid, long actionId, String failureMsg, Tuple failureReason, Op op){
 
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op,failureMsg, failureReason));
-        
         long id = nextTimestamp.incrementAndGet();
         ActionFailedEvent ev = new ActionFailedEvent(id, actionId, op, failureMsg, failureReason);
         return ev;
@@ -89,11 +75,6 @@ public class EventRegistry {
 
     public FocusSucceededEvent makeFocusActionSucceededEvent(long actionId, ArtifactId aid, Op op, ArtifactId target, List<ArtifactObsProperty> props){
 
-        if (aid != null) {
-            SimulationController contr = SimulationController.getSimulationController();
-            contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-        }
-        
         long id = nextTimestamp.incrementAndGet();
         FocusSucceededEvent ev = new FocusSucceededEvent(id, actionId, op, aid, target, props);
         return ev;
@@ -101,9 +82,6 @@ public class EventRegistry {
 
     public StopFocusSucceededEvent makeStopFocusActionSucceededEvent(long actionId, ArtifactId aid, Op op, ArtifactId target,List<ArtifactObsProperty> props){
 
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-        
         long id = nextTimestamp.incrementAndGet();
         StopFocusSucceededEvent ev = new StopFocusSucceededEvent(id, actionId, op, aid, target, props);
         return ev;
@@ -111,20 +89,12 @@ public class EventRegistry {
 
     public JoinWSPSucceededEvent makeJoinWSPSucceededEvent(long actionId, ArtifactId aid, Op op, WorkspaceId wspId, ICartagoContext ctx) {
 
-        if (aid != null) {
-            SimulationController contr = SimulationController.getSimulationController();
-            contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
-        }
-        
         long id = nextTimestamp.incrementAndGet();
         JoinWSPSucceededEvent ev = new JoinWSPSucceededEvent(id, actionId, op, aid, wspId, ctx);
         return ev;
     }
 
     public QuitWSPSucceededEvent makeQuitWSPSucceededEvent(long actionId, ArtifactId aid, Op op, WorkspaceId wspId) {
-        
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
         
         long id = nextTimestamp.incrementAndGet();
         QuitWSPSucceededEvent ev = new QuitWSPSucceededEvent(id, actionId, op, aid, wspId);

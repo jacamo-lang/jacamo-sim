@@ -233,11 +233,11 @@ public class CentralisedAgArch extends AgArch implements Runnable {
     }
 
     public void run() {
-    	/* @SIMU */
+        /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
         contr.notifyECControlFlowStarted(Thread.currentThread());
         
-    	TransitionSystem ts = getTS();
+        TransitionSystem ts = getTS();
         while (running) {
             if (ts.getSettings().isSync()) {
                 waitSyncSignal();

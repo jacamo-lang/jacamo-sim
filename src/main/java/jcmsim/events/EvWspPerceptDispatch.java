@@ -1,8 +1,5 @@
 package jcmsim.events;
 
-import java.util.Date;
-
-import cartago.AgentId;
 import cartago.CartagoEvent;
 import jcmsim.ECEvent;
 

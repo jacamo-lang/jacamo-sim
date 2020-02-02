@@ -48,8 +48,7 @@ import jcmsim.SimulationController;
 import jcmsim.ECEvent;
 import jcmsim.ExecContext.ECType;
 import jcmsim.PendingECEvent;
-import jcmsim.events.EvArtOpEnqueued;
-import jcmsim.events.EvWspNewOpToExec;
+import jcmsim.events.*;
 
 
 /**
@@ -1091,15 +1090,15 @@ public class Workspace {
                 OpId oid = des.getAdapter().getFreshId(op.getName(),userId);
                 OpExecutionFrame info = new OpExecutionFrame(this,oid,ctx, actionId, userId, aid,op,timeout,test);
                 try {
-                	
-                	// @SIMU
-                	
-                	ECEvent scheduledEvent = new EvArtOpEnqueued(info);
-                	PendingECEvent schedEv = contr.scheduleEvent(aid.getName(), scheduledEvent);
-                	
-                	contr.waitToExecEvent(schedEv);
-                	
-                	
+                    
+                    // @SIMU
+                    
+                    ECEvent scheduledEvent = new EvArtOpEnqueued(info);
+                    PendingECEvent schedEv = contr.scheduleEvent(aid.getName(), scheduledEvent);
+                    
+                    contr.waitToExecEvent(schedEv);
+                    
+                    
                     opTodo.put(info);
                     return;
                 } catch (Exception ex){
@@ -1118,7 +1117,7 @@ public class Workspace {
                 OpId oid = des.getAdapter().getFreshId(request.getOp().getName(),userId);
                 OpExecutionFrame frame = new OpExecutionFrame(this,oid,ctx, actionId, userId, aid, request.getOp(), timeout, test);
                 try {
-                	
+                    
                     opTodo.put(frame);
                     return;
                 } catch (Exception ex){
@@ -1582,11 +1581,11 @@ public class Workspace {
         }
     }
 
-    
+    /*
     public void notifyActionCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op) {
         ActionSucceededEvent ev = eventRegistry.makeActionSucceededEvent(actionId, aid, op);
         listener.notifyCartagoEvent(ev);
-    }
+    }*/
 
     
     public void notifyActionCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op, AgentId userId) {            
@@ -1594,37 +1593,93 @@ public class Workspace {
         if(wspRuleEngine!=null){ //informing the action completed to the AbstractWSPRuleEngine.
             wspRuleEngine.processActionCompleted(ev, userId);          
         }
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (aid != null) {
+        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+
         listener.notifyCartagoEvent(ev);                        
     }
 
     public void notifyActionFailed(ICartagoCallback listener, ArtifactId id, long actionId, Op op, String failureMsg, Tuple failureReason) {
         ActionFailedEvent ev = eventRegistry.makeActionFailedEvent(id, actionId, failureMsg, failureReason, op);
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (id != null) {
+        	contr.notifyEventExecution(id.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+        
         listener.notifyCartagoEvent(ev);
     }
 
     public void notifyFocusCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op, ArtifactId target, List<ArtifactObsProperty> props) {
         ActionSucceededEvent ev = eventRegistry.makeFocusActionSucceededEvent(actionId, aid, op, target, props);
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (aid != null) {
+        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+     
         listener.notifyCartagoEvent(ev);
     }
 
 
     public void notifyStopFocusCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op, ArtifactId target, List<ArtifactObsProperty> props) {
         ActionSucceededEvent ev = eventRegistry.makeStopFocusActionSucceededEvent(actionId, aid, op, target, props);
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (aid != null) {
+        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+        
         listener.notifyCartagoEvent(ev);
     }
 
     public void notifyJoinWSPCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op, WorkspaceId wspId, ICartagoContext ctx) {
         ActionSucceededEvent ev = eventRegistry.makeJoinWSPSucceededEvent(actionId, aid, op, wspId, ctx);
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (aid != null) {
+        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+
         listener.notifyCartagoEvent(ev);
     }
 
     public void notifyQuitWSPCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op, WorkspaceId wspId) {
         ActionSucceededEvent ev = eventRegistry.makeQuitWSPSucceededEvent(actionId, aid, op, wspId);
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (aid != null) {
+        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+
         listener.notifyCartagoEvent(ev);
     }
 
     public void notifyConsultManualCompleted(ICartagoCallback listener, long actionId, ArtifactId aid, Op op, Manual man) {
         ActionSucceededEvent ev = eventRegistry.makeConsultManualSucceededEvent(actionId, aid, op, man);
+
+        /* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        if (aid != null) {
+        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+        }
+        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
+
         listener.notifyCartagoEvent(ev);
     }
 
@@ -1814,7 +1869,7 @@ public class Workspace {
         }
 
         public void run(){
-        	/* @SIMU */
+            /* @SIMU */
             SimulationController contr = SimulationController.getSimulationController();
 
             stopped = false;
@@ -1822,7 +1877,7 @@ public class Workspace {
                 try {
                     OpExecutionFrame item = opBuffer.take();  
                     
-                	/* @SIMU */
+                    /* @SIMU */
                     contr.notifyECControlFlowStarted(this);
                     
                     //log("New job to do: "+item.getOpId());
@@ -1838,7 +1893,7 @@ public class Workspace {
                         break;
                     }*/
                 } finally {
-                	/* @SIMU */
+                    /* @SIMU */
                     contr.notifyECControlFlowFinished(this);
                 }
             }

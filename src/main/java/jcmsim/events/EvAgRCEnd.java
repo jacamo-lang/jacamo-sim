@@ -24,7 +24,7 @@ public class EvAgRCEnd extends ECEvent {
     }
 
     public ECActivity[] getActivitiesToBegin() {
-    	return new ECActivity[] { new ActAgBetweenRC(this) };
+        return new ECActivity[] { new ActAgBetweenRC(this) };
     }
     
     public String toString() {

@@ -266,9 +266,9 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         // System.out.println("NOTIFIED "+ev.getId()+"
         // "+ev.getClass().getCanonicalName());
         
-    	/* 
-    	 * @SIMU 
-    	 */
+        /* 
+         * @SIMU 
+         */
         SimulationController contr = SimulationController.getSimulationController();
         
         PendingECEvent evScheduled = null;
@@ -311,11 +311,11 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
             keepEvent = agentArchListener.notifyCartagoEvent(ev);
         }
         if (keepEvent) {
-        	
-        	if (evScheduled != null) {
-        		contr.waitToExecEvent(evScheduled);
-        	}
-        	
+            
+            if (evScheduled != null) {
+                contr.waitToExecEvent(evScheduled);
+            }
+            
             perceptQueue.add(ev);
         }
     }

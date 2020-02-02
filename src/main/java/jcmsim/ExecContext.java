@@ -67,10 +67,10 @@ public class ExecContext {
     /* this is about notifying event execution */
     
     public synchronized void notifyEventExecution(ECEvent ev) {
-    	eventHistory.add(ev);
+        eventHistory.add(ev);
 
-    	for (ECActivity _act:  ev.getActivitiesToBegin()) {
-        	activityHistory.add(_act);
+        for (ECActivity _act:  ev.getActivitiesToBegin()) {
+            activityHistory.add(_act);
         }
 
         if (sim.isRealTimeMode()) {    
@@ -83,7 +83,6 @@ public class ExecContext {
                     if (act.isPending()) {
                         if (act.checkAndAppyCompletion(ev)) {
                             act.setEndEvent(ev);
-                            break;
                         }
                     }
                 }
@@ -94,21 +93,23 @@ public class ExecContext {
                     if (act.isPending()) {
                         if (act.checkAndAppyCompletion(ev)) {
                             act.setEndEvent(ev);                        
-        	                currentTime = act.getBeginEvent().getTime() + sim.getDuration(act);
-                            ev.setTime(currentTime);
-                            break;
+                            long dur =  sim.getDurationInMicroSec(act, this);
+                            currentTimeMicro = act.getBeginEvent().getTimeInMicroSec() + dur;
+                            currentTime = act.getBeginEvent().getTime() + dur/1000;
+                            
+                            ev.setTime(currentTime, currentTimeMicro);
                         }
                     }
                 }
             } else {
-                /* if the event is sporadic.. */           	
-            	ev.setTime(currentTime);        
+                /* if the event is sporadic.. */            
+                ev.setTime(currentTime);        
             } 
         }
-	}
+    }
 
     public synchronized PendingECEvent scheduleEvent(ECEvent ev) {
-    	if (sim.isRealTimeMode()) {    
+        if (sim.isRealTimeMode()) {    
             this.notifyEventExecution(ev);
             return null;
         } else {
@@ -116,47 +117,48 @@ public class ExecContext {
                 for (ECActivity act: activityHistory) {
                     if (act.isPending()) {
                         if (act.checkAndAppyCompletion(ev)) {
-                            act.setEndEvent(ev);                        
-                            ev.setTime(act.getBeginEvent().getTime() + sim.getDuration(act));
+                            act.setEndEvent(ev);       
+                            long dur =  sim.getDurationInMicroSec(act, this);                            
+                            ev.setTime(act.getBeginEvent().getTime() + dur/1000, act.getBeginEvent().getTimeInMicroSec() + dur);
                             break;
                         }
                     }
                 }
             } else {
-                /* if the event is sporadic.. */           	
-            	ev.setTime(currentTime);        
-            } 	
+                /* if the event is sporadic.. */            
+                ev.setTime(currentTime);        
+            }   
             PendingECEvent pe = new PendingECEvent(ev);
             fes.add(pe);
             // log("scheduled " + ev);
             return pe;
         }
-	}
+    }
     
     public PendingECEvent selectEventAndAdvanceTime() {
 
-    	/* select and remove next event */
-    	
-    	long min = Long.MAX_VALUE;
-    	PendingECEvent sel = null;
-    	for (PendingECEvent pe: fes) {
-    		if (pe.getEvent().getTime() < min) {
-    			min = pe.getEvent().getTime();
-    			sel = pe;   
-    		}
-    	}
-    	
-    	if (sel != null) {
-    		fes.remove(sel);
-    	
-    		/* advance simulated time to desired exection time */
-    		this.currentTime = min;
-    	}
-    	return sel;
+        /* select and remove next event */
+        
+        long min = Long.MAX_VALUE;
+        PendingECEvent sel = null;
+        for (PendingECEvent pe: fes) {
+            if (pe.getEvent().getTime() < min) {
+                min = pe.getEvent().getTime();
+                sel = pe;   
+            }
+        }
+        
+        if (sel != null) {
+            fes.remove(sel);
+        
+            /* advance simulated time to desired exection time */
+            this.currentTime = min;
+        }
+        return sel;
     }
     
     private void log(String msg) {
-    	System.out.println("[EC " + this.getId() +"] " + msg);
+        System.out.println("[EC " + this.getId() +"] " + msg);
     }
     
 }

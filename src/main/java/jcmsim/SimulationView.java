@@ -78,7 +78,7 @@ public class SimulationView extends JFrame  {
 
         public ReportFrame() {
             setTitle("Simulation Viewer | Report");
-			setSize(600, 600);
+            setSize(600, 600);
             
             JPanel panel = new JPanel();
             setContentPane(panel);

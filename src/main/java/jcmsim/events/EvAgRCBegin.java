@@ -20,7 +20,7 @@ public class EvAgRCBegin extends ECEvent {
     }
     
     public ECActivity[] getActivitiesToBegin() {
-    	return new ECActivity[] { new ActAgRC(this), new ActAgRCFetchPercept(this) };
+        return new ECActivity[] { new ActAgRC(this), new ActAgRCFetchPercept(this) };
     }
 
     public boolean isActivityEnd() {

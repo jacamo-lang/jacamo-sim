@@ -144,8 +144,8 @@ public class ArtifactDescriptor {
                             if (ev instanceof ArtifactObsEvent){
                                 boolean res = filter.select((ArtifactObsEvent)ev);
                                 if (res){
-                                    /* @SIMU */
-                                    
+                                	
+                                    /* @SIMU */                                    
                                     ArtifactObsEvent ev1 = (ArtifactObsEvent) ev;
                                     SimulationController contr = SimulationController.getSimulationController();
                                     contr.notifyEventExecution(((ArtifactObsEvent) ev).getArtifactId().getName(), new EvArtObsStateEvent(ev1));
@@ -179,6 +179,13 @@ public class ArtifactDescriptor {
                                 if (ev instanceof ArtifactObsEvent){
                                     boolean res = filter.select((ArtifactObsEvent)ev);
                                     if (res){
+                                    	
+                                        /* @SIMU */                                    
+                                        ArtifactObsEvent ev1 = (ArtifactObsEvent) ev;
+                                        SimulationController contr = SimulationController.getSimulationController();
+                                        contr.notifyEventExecution(((ArtifactObsEvent) ev).getArtifactId().getName(), new EvArtObsStateEvent(ev1));
+                                        contr.notifyEventExecution(ev1.getArtifactId().getWorkspaceId().getName(), new EvWspObsStateDispatch(ev1, obs.getAgentId()));
+                                    	
                                         obs.getListener().notifyCartagoEvent(ev);
                                     }
                                 }

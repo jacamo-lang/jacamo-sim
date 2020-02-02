@@ -15,7 +15,7 @@ public class ActArtOpDispatch extends ECActivity {
 
     public boolean checkAndAppyCompletion(ECEvent ev) {
         if (ev instanceof EvArtOpExecBegin) {
-        	EvArtOpExecBegin ev2 = (EvArtOpExecBegin) ev;
+            EvArtOpExecBegin ev2 = (EvArtOpExecBegin) ev;
             if (((EvArtOpEnqueued) this.getBeginEvent()).getInfo().getActionId() == ev2.getInfo().getActionId()){
                 this.setEndEvent(ev2);
                 return true;

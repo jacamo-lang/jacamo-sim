@@ -126,7 +126,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
             this.agent = getTS().getAg();
             this.belBase = agent.getBB();
 
-        	/* @SIMU */
+            /* @SIMU */
             SimulationController contr = SimulationController.getSimulationController();
             contr.notifyECControlFlowStarted(Thread.currentThread());
 
@@ -464,10 +464,10 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
 
         try {
 
-        	
-        	PendingECEvent evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
-        	contr.waitToExecEvent(evScheduled);
-        	
+            
+            PendingECEvent evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+            contr.waitToExecEvent(evScheduled);
+            
             CartagoEvent evt = envSession.fetchNextPercept();
 
             while (evt != null) {
@@ -487,7 +487,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                     perceiveAddedOP(ev);
                     perceiveRemovedOP(ev);
                     
-                    contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgBBUpdatedFromPercept(ev));                     
+                    contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgBelUpdatedFromPercept(ev));                     
 
                 } else if (evt instanceof ObsArtListChangedEvent) {
                     /* experimental */
@@ -509,9 +509,8 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                     contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));                       
                 }
                 
-                
                 evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
-            	contr.waitToExecEvent(evScheduled);
+                contr.waitToExecEvent(evScheduled);
                 
                 evt = envSession.fetchNextPercept();
             }

@@ -45,13 +45,13 @@ public class SimulationController extends Thread  {
     
     private SimulationController() {
         
-    	ectxControlFlowsLock = new ReentrantLock();
-    	ectxControlFlowsStateUpdated = ectxControlFlowsLock.newCondition();
-    	
-    	ectxControlFlows = new ArrayList<Thread>();
-    	ectxControlFlowsState = new HashMap<String, Boolean>();
-    	
-    	ectxs = new ConcurrentHashMap<String, ExecContext> ();
+        ectxControlFlowsLock = new ReentrantLock();
+        ectxControlFlowsStateUpdated = ectxControlFlowsLock.newCondition();
+        
+        ectxControlFlows = new ArrayList<Thread>();
+        ectxControlFlowsState = new HashMap<String, Boolean>();
+        
+        ectxs = new ConcurrentHashMap<String, ExecContext> ();
     }
         
     public void init(Simulation sim) {
@@ -62,8 +62,8 @@ public class SimulationController extends Thread  {
         logger.start();
 
         if (!sim.isRealTimeMode()) {                 
-        	loop = new SimulationLoop();
-        	loop.start();
+            loop = new SimulationLoop();
+            loop.start();
         }        
     }
           
@@ -99,11 +99,11 @@ public class SimulationController extends Thread  {
     /* called by an EC control flow to schedule an event on a specific EC */
     
     public PendingECEvent scheduleEvent(String ctxId, ECEvent ev) {
-    	ExecContext ctx = ectxs.get(ctxId);
+        ExecContext ctx = ectxs.get(ctxId);
         if (ctx != null) {
             return ctx.scheduleEvent(ev);
         } else {
-        	return null;
+            return null;
         }
     }
 
@@ -118,57 +118,57 @@ public class SimulationController extends Thread  {
     }
 
     public void notifyECControlFlowStarted(Thread t) {
-	    ectxControlFlowsLock.lock();
-    	// log("active worker " + t.getName() + " started working");
-    	ectxControlFlows.add(t);
-    	ectxControlFlowsState.put(t.getName(), true);
-    	this.ectxControlFlowsStateUpdated.signalAll();
-	   	ectxControlFlowsLock.unlock();
+        ectxControlFlowsLock.lock();
+        // log("active worker " + t.getName() + " started working");
+        ectxControlFlows.add(t);
+        ectxControlFlowsState.put(t.getName(), true);
+        this.ectxControlFlowsStateUpdated.signalAll();
+        ectxControlFlowsLock.unlock();
     }
 
     public void notifyECControlFlowFinished(Thread t) {
-	    ectxControlFlowsLock.lock();
-	    // log("active worker " + t.getName() + " stopped working");
-	    ectxControlFlows.remove(t);
-	    ectxControlFlowsState.remove(t.getName());	    
-    	this.ectxControlFlowsStateUpdated.signalAll();
-	   	ectxControlFlowsLock.unlock();
+        ectxControlFlowsLock.lock();
+        // log("active worker " + t.getName() + " stopped working");
+        ectxControlFlows.remove(t);
+        ectxControlFlowsState.remove(t.getName());      
+        this.ectxControlFlowsStateUpdated.signalAll();
+        ectxControlFlowsLock.unlock();
     }
 
     public void notifyECControlFlowWaiting(Thread t) throws InterruptedException {
-	    ectxControlFlowsLock.lock();
-    	// log("active worker " + t.getName() + " going to block");
-    	ectxControlFlowsState.put(t.getName(), false);
-    	this.ectxControlFlowsStateUpdated.signalAll();
-	   	ectxControlFlowsLock.unlock();
+        ectxControlFlowsLock.lock();
+        // log("active worker " + t.getName() + " going to block");
+        ectxControlFlowsState.put(t.getName(), false);
+        this.ectxControlFlowsStateUpdated.signalAll();
+        ectxControlFlowsLock.unlock();
     }
 
     public void notifyECControlFlowRunning(Thread t) throws InterruptedException {
-	    ectxControlFlowsLock.lock();
-    	// log("active worker " + t.getName() + " unblocked");
-    	ectxControlFlowsState.put(t.getName(), true);
-    	this.ectxControlFlowsStateUpdated.signalAll();
-	   	ectxControlFlowsLock.unlock();
+        ectxControlFlowsLock.lock();
+        // log("active worker " + t.getName() + " unblocked");
+        ectxControlFlowsState.put(t.getName(), true);
+        this.ectxControlFlowsStateUpdated.signalAll();
+        ectxControlFlowsLock.unlock();
     }
     
     public void waitToExecEvent(PendingECEvent pev) {
-    	if (!sim.isRealTimeMode()) {
-    		
-    		try {
-	    		this.notifyECControlFlowWaiting(Thread.currentThread());
-	    		// log(Thread.currentThread().getName() + " - wait for exec of " + pev.getEvent());
-	    		pev.waitForSched();	    		
-	    		// log(Thread.currentThread().getName() + " - signaled for exec of " + pev.getEvent());
-	    		this.notifyECControlFlowRunning(Thread.currentThread());
-	    	} catch (Exception ex) {
-	    		ex.printStackTrace();
-	    	}
-    	}
+        if (!sim.isRealTimeMode()) {
+            
+            try {
+                this.notifyECControlFlowWaiting(Thread.currentThread());
+                // log(Thread.currentThread().getName() + " - wait for exec of " + pev.getEvent());
+                pev.waitForSched();             
+                // log(Thread.currentThread().getName() + " - signaled for exec of " + pev.getEvent());
+                this.notifyECControlFlowRunning(Thread.currentThread());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
    
     
     private void log(String msg) {
-    	System.out.println("[SIMULATION CONTROLLER] " + msg);
+        System.out.println("[SIMULATION CONTROLLER] " + msg);
     }
 
     
@@ -176,49 +176,49 @@ public class SimulationController extends Thread  {
     
     class SimulationLoop extends Thread {
 
-    	public void run() {		
-    		while (true) {
-    			try {
-    				/* wait current EC control flows to complete current event execution */
-    		    	
-    			   	ectxControlFlowsLock.lock();
-    		    
-    		    	boolean allBlocked = false;
-    		    	while (!allBlocked) {
-    		    		allBlocked = true;
-    		    		// log("checking for active workers - " + activeWorkerState.size());
-    			    	for (Entry<String, Boolean> t: ectxControlFlowsState.entrySet()) {
-    			    		if (t.getValue()) {
-    			    			// log("worker " + t.getKey() + " not blocked ");
-    			    			allBlocked = false;
-    			    			break;
-    			    		}
-    			    	}
-    			    	if (!allBlocked) {
-    			    		ectxControlFlowsStateUpdated.await();
-    			    	} 
-    		    	}
-    			   	ectxControlFlowsLock.unlock();
+        public void run() {     
+            while (true) {
+                try {
+                    /* wait current EC control flows to complete current event execution */
+                    
+                    ectxControlFlowsLock.lock();
+                
+                    boolean allBlocked = false;
+                    while (!allBlocked) {
+                        allBlocked = true;
+                        // log("checking for active workers - " + activeWorkerState.size());
+                        for (Entry<String, Boolean> t: ectxControlFlowsState.entrySet()) {
+                            if (t.getValue()) {
+                                // log("worker " + t.getKey() + " not blocked ");
+                                allBlocked = false;
+                                break;
+                            }
+                        }
+                        if (!allBlocked) {
+                            ectxControlFlowsStateUpdated.await();
+                        } 
+                    }
+                    ectxControlFlowsLock.unlock();
 
-    		    	
-    		    	/* for each execution context select and exec an event from FES and update simulated time */
-    		    	
-    		    	for (ExecContext ec: ectxs.values()) {
-    		    		
-    		    		PendingECEvent pev = ec.selectEventAndAdvanceTime();
-    		    	
-    		    		/* exec selected event */
-    		    		
-    		    		if (pev != null) {
-    		    			pev.signalExecution();
-    		    		}
-    		    	}
+                    
+                    /* for each execution context select and exec an event from FES and update simulated time */
+                    
+                    for (ExecContext ec: ectxs.values()) {
+                        
+                        PendingECEvent pev = ec.selectEventAndAdvanceTime();
+                    
+                        /* exec selected event */
+                        
+                        if (pev != null) {
+                            pev.signalExecution();
+                        }
+                    }
 
-    			} catch (Exception ex) {
-    				ex.printStackTrace();
-    			}
-    		}
-    	}
-            	
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+                
     }
 }

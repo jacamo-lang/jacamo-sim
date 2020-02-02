@@ -19,7 +19,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src/jaca/java"/>
-	<classpathentry kind="src" path="src/test/jcmsim"/>
+	<classpathentry kind="src" path="src/test/jcmsim/example-1"/>
+	<classpathentry kind="src" path="src/test/jcmsim/example-0"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="output" path="bin/default"/>

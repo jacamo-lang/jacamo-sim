@@ -19,7 +19,7 @@ public class EvArtOpExecBegin extends ECEvent{
     
 
     public ECActivity[] getActivitiesToBegin() {
-    	return new ECActivity[] { new ActArtOpExec(this) };
+        return new ECActivity[] { new ActArtOpExec(this) };
     }
 
 

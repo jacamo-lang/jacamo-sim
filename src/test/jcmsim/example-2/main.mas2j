@@ -1,0 +1,10 @@
+MAS test {
+
+    environment: jaca.CartagoEnvironment("-debug")
+    
+    agents:  
+    agent0 agentArchClass jaca.CAgentArch;
+    agent1 agentArchClass jaca.CAgentArch;
+
+    aslSourcePath: "src/test/jcmsim/example-1";
+}

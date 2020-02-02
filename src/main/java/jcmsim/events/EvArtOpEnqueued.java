@@ -16,7 +16,7 @@ public class EvArtOpEnqueued extends ECEvent {
     private OpExecutionFrame info;
     
     public EvArtOpEnqueued(OpExecutionFrame info) {
-    	this.info = info;
+        this.info = info;
     }
         
     public OpExecutionFrame getInfo() {

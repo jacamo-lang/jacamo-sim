@@ -40,7 +40,7 @@ public class EvWspActDispatch extends ECEvent {
     }
     
     public ECActivity[] getActivitiesToBegin() {
-    	return new ECActivity[] { new ActWspActOpDispatch(this) };
+        return new ECActivity[] { new ActWspActOpDispatch(this) };
     }
     
     public EvAgExtActRequest getCausedByEvent() {

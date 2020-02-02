@@ -25,6 +25,7 @@ import java.util.logging.LogManager;
 import jcmsim.SimulationController;
 import jcmsim.ExecContext.ECType;
 import jcmsim.events.EvArtOpExecBegin;
+import jcmsim.events.EvArtOpExecEnd;
 
 import java.io.*;
 
@@ -439,6 +440,10 @@ public abstract class Artifact {
                                 log.opCompleted(System.currentTimeMillis(), info.getOpId(), this.id, info.getOperation());
                             }                   
                             if (!info.completionNotified()){
+                            	
+                                /* @SIMU */
+                                contr.notifyEventExecution(this.id.getName(), new EvArtOpExecEnd(info.getActionId(), id, op));
+                                                            	
                                 info.notifyOpCompletion();
                             }
                         } else {
@@ -449,6 +454,10 @@ public abstract class Artifact {
                                 log.opFailed(System.currentTimeMillis(), info.getOpId(), this.id, info.getOperation(), msg, desc);
                             }                   
                             obsPropertyMap.rollbackChanges();
+
+                            /* @SIMU */
+                            contr.notifyEventExecution(id.getName(), new EvArtOpExecEnd(info.getActionId(), id, op, msg, desc));
+                            
                             info.notifyOpFailed();
                         }
                     }

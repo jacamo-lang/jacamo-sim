@@ -1,13 +1,10 @@
 package jcmsim.events;
 
-import java.util.Date;
-import java.util.Optional;
-
 import cartago.*;
 import cartago.events.ArtifactObsEvent;
 import jcmsim.ECActivity;
 import jcmsim.ECEvent;
-import jcmsim.activities.ActWspObsStatePerceptDispatch;
+import jcmsim.activities.ActWspObsStateToPerceptDispatch;
 
 public class EvWspObsStateDispatch extends ECEvent {
 
@@ -33,7 +30,7 @@ public class EvWspObsStateDispatch extends ECEvent {
     }
     
     public ECActivity[] getActivitiesToBegin() {
-    	return new ECActivity[] { new ActWspObsStatePerceptDispatch(this) };
+        return new ECActivity[] { new ActWspObsStateToPerceptDispatch(this) };
     }
     
 }
