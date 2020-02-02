@@ -69,7 +69,7 @@ public class EventRegistry {
         /* @SIMU */
         if (aid != null) {   
             SimulationController contr = SimulationController.getSimulationController();
-            contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+            contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
         }        
         
         long id = nextTimestamp.incrementAndGet();
@@ -80,7 +80,7 @@ public class EventRegistry {
     public ActionFailedEvent makeActionFailedEvent(ArtifactId aid, long actionId, String failureMsg, Tuple failureReason, Op op){
 
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op,failureMsg, failureReason));
+        contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op,failureMsg, failureReason));
         
         long id = nextTimestamp.incrementAndGet();
         ActionFailedEvent ev = new ActionFailedEvent(id, actionId, op, failureMsg, failureReason);
@@ -91,7 +91,7 @@ public class EventRegistry {
 
         if (aid != null) {
             SimulationController contr = SimulationController.getSimulationController();
-            contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+            contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
         }
         
         long id = nextTimestamp.incrementAndGet();
@@ -102,7 +102,7 @@ public class EventRegistry {
     public StopFocusSucceededEvent makeStopFocusActionSucceededEvent(long actionId, ArtifactId aid, Op op, ArtifactId target,List<ArtifactObsProperty> props){
 
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+        contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
         
         long id = nextTimestamp.incrementAndGet();
         StopFocusSucceededEvent ev = new StopFocusSucceededEvent(id, actionId, op, aid, target, props);
@@ -113,7 +113,7 @@ public class EventRegistry {
 
         if (aid != null) {
             SimulationController contr = SimulationController.getSimulationController();
-            contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+            contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
         }
         
         long id = nextTimestamp.incrementAndGet();
@@ -124,7 +124,7 @@ public class EventRegistry {
     public QuitWSPSucceededEvent makeQuitWSPSucceededEvent(long actionId, ArtifactId aid, Op op, WorkspaceId wspId) {
         
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
+        contr.notifyEventExecution(aid.toString(), new EvArtOpExecEnd(actionId, aid, op));
         
         long id = nextTimestamp.incrementAndGet();
         QuitWSPSucceededEvent ev = new QuitWSPSucceededEvent(id, actionId, op, aid, wspId);

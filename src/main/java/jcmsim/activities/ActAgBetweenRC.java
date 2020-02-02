@@ -1,16 +1,16 @@
 package jcmsim.activities;
 
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.events.*;
 
-public class ActAgBetweenRC extends EvCtxActivity {
+public class ActAgBetweenRC extends ECActivity {
     
     public ActAgBetweenRC(EvAgRCEnd ev){
         super(ev);
     }
 
-    public boolean checkAndAppyCompletion(EvCtxEvent ev) {
+    public boolean checkAndAppyCompletion(ECEvent ev) {
         if (ev instanceof EvAgRCBegin) {
             EvAgRCBegin ev2 = (EvAgRCBegin) ev;
             if (((EvAgRCEnd) this.getBeginEvent()).getNumCycle() == ev2.getNumCycle() - 1){

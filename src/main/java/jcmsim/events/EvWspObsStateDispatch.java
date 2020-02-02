@@ -5,11 +5,11 @@ import java.util.Optional;
 
 import cartago.*;
 import cartago.events.ArtifactObsEvent;
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.activities.ActWspObsStatePerceptDispatch;
 
-public class EvWspObsStateDispatch extends EvCtxEvent {
+public class EvWspObsStateDispatch extends ECEvent {
 
     private ArtifactObsEvent ev;
     private AgentId observer;
@@ -32,8 +32,8 @@ public class EvWspObsStateDispatch extends EvCtxEvent {
         
     }
     
-    public Optional<EvCtxActivity> getActivityToBegin() {
-        return Optional.of(new ActWspObsStatePerceptDispatch(this));
+    public ECActivity[] getActivitiesToBegin() {
+    	return new ECActivity[] { new ActWspObsStatePerceptDispatch(this) };
     }
     
 }

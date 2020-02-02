@@ -1,17 +1,17 @@
 package jcmsim.activities;
 
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.events.EvWspActDispatch;
 import jcmsim.events.EvWspNewOpToExec;
 
-public class ActWspActOpDispatch extends EvCtxActivity {
+public class ActWspActOpDispatch extends ECActivity {
     
     public ActWspActOpDispatch(EvWspActDispatch ev){
         super(ev);
     }
 
-    public boolean checkAndAppyCompletion(EvCtxEvent ev) {
+    public boolean checkAndAppyCompletion(ECEvent ev) {
         if (ev instanceof EvWspNewOpToExec) {
             EvWspNewOpToExec ev2 = (EvWspNewOpToExec) ev;
             if (((EvWspActDispatch) this.getBeginEvent()).getActionId() == ev2.getActionId()){

@@ -3,11 +3,11 @@ package jcmsim.events;
 import java.util.Optional;
 
 import cartago.CartagoEvent;
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.activities.ActAgPercToBel;
 
-public class EvAgNewPerceptNotified extends EvCtxEvent {
+public class EvAgNewPerceptNotified extends ECEvent {
 
     private CartagoEvent ev;
     
@@ -19,10 +19,10 @@ public class EvAgNewPerceptNotified extends EvCtxEvent {
         return ev;
     }
     
-    public Optional<EvCtxActivity> getActivityToBegin() {
-        return Optional.of(new ActAgPercToBel(this));
+    public ECActivity[] getActivitiesToBegin() {
+    	return new ECActivity[] { new ActAgPercToBel(this) };
     }
-
+    
     public String toString() {
         return "[event: new percept notified | percept id: " + ev.getId() + " | " + ev.getClass().getName() + "]";
         

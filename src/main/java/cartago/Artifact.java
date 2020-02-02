@@ -23,7 +23,7 @@ import java.util.concurrent.locks.*;
 import java.util.logging.LogManager;
 
 import jcmsim.SimulationController;
-import jcmsim.EvCtx.EvCtxType;
+import jcmsim.ExecContext.ECType;
 import jcmsim.events.EvArtOpExecBegin;
 
 import java.io.*;
@@ -78,7 +78,7 @@ public abstract class Artifact {
 
         /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
-        contr.createNewTContext(id.getName(), EvCtxType.ARTIFACT, System.currentTimeMillis());
+        contr.createNewExecContext(id.getName(), ECType.ARTIFACT, System.currentTimeMillis());
 
         
         lock = new ReentrantLock(true);
@@ -331,7 +331,7 @@ public abstract class Artifact {
          * @SIMU
          */
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(this.id.toString(), new EvArtOpExecBegin(this.id, info));
+        contr.notifyEventExecution(this.id.toString(), new EvArtOpExecBegin(this.id, info));
         
         
         ICartagoLoggerManager log = wsp.getLoggerManager();

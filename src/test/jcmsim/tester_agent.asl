@@ -23,50 +23,6 @@
 //!test_array_obj.
 //!test_ext_interface.
 
-
-   
-+!test_console <-
-  println("this print is done by the console artifact").
-
-
-/* test double join */
-
-+!test_double_join 
-  <- createWorkspace("w0");
-     println("joining...");
-     joinWorkspace("w0",WspID);
-     joinWorkspace("w0",WspID2)[wsp("main")].
-     
--!test_double_join [error_msg(Msg)] 
-  <- println("OK, got error");
-     println("Message: ",Msg).
-  
-     
-/* testing artifact with a direct external interface */
-
-+!test_ext_interface
-    <- makeArtifact("myArt","test.ArtifactWithExtUse",[],Id);
-        +count(0);
-       focus(Id).
-
-+a(X) : count(Y) & Y > 10
-    <- reset;
-        -+count(0).
-    
-+a(X) 
-    <- println(X);
-       ?count(Y);
-       -+count(Y+1).
-
-/* ------- */
-      
-
-+!test_array_obj 
-  <-  makeArtifact("myArt","test.ArtifactWithArray",[],Id);
-      getCurrentArtifacts(L);
-      println(L);
-      myOp(L).
-      
   
 +!main_test
   <-  .println("started.");
@@ -171,7 +127,7 @@
   <- println("got it: ",Msg," ",Y).    
 
     
-//
+/* 
 
 +!test2
   <- makeArtifact("my_clock","cartago.tools.Clock",[],Id);
@@ -280,23 +236,6 @@
 +count(V)[artifact_name(Id,c0)]
   <- println("perceived from remote counter: ",V).
 
-/*  
-+!test_wsp 
-  <- createWorkspace("w0");
-     println("joining...");
-     joinWorkspace("w0",WspID);
-     println("making artifact...");
-     makeArtifact("a0","test.MyArtifactA",[],Id2);
-     println("looking up...");
-     lookupArtifact("a0",Id3);
-     println("hello ",Id3);
-     createWorkspace("w1");
-     println("joining w1...");
-     joinWorkspace("w1",WspID2);
-     println("computing...");
-     compute(5,X,Y)[wsp("w0")];
-     println(X).     
-*/
 
 +!test_wsp
   <- createWorkspace("w0");
@@ -367,6 +306,48 @@
 -!test_wspruleman [error_msg(M)]
     <-  println(M). 
   
+  +!test_console <-
+  println("this print is done by the console artifact").
+
+
+// test double join 
+
++!test_double_join 
+  <- createWorkspace("w0");
+     println("joining...");
+     joinWorkspace("w0",WspID);
+     joinWorkspace("w0",WspID2)[wsp("main")].
+     
+-!test_double_join [error_msg(Msg)] 
+  <- println("OK, got error");
+     println("Message: ",Msg).
+  
+     
+// testing artifact with a direct external interface 
+
++!test_ext_interface
+    <- makeArtifact("myArt","test.ArtifactWithExtUse",[],Id);
+        +count(0);
+       focus(Id).
+
++a(X) : count(Y) & Y > 10
+    <- reset;
+        -+count(0).
+    
++a(X) 
+    <- println(X);
+       ?count(Y);
+       -+count(Y+1).
+
+      
+
++!test_array_obj 
+  <-  makeArtifact("myArt","test.ArtifactWithArray",[],Id);
+      getCurrentArtifacts(L);
+      println(L);
+      myOp(L).
+      
+*/  
   
      
 // not handled events      

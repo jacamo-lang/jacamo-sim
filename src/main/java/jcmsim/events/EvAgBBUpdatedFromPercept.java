@@ -1,9 +1,9 @@
 package jcmsim.events;
 
 import cartago.events.ArtifactObsEvent;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
 
-public class EvAgBBUpdatedFromPercept extends EvCtxEvent {
+public class EvAgBBUpdatedFromPercept extends ECEvent {
 
     private ArtifactObsEvent ev;
     

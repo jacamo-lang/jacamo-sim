@@ -3,11 +3,11 @@ package jcmsim.events;
 import java.util.Optional;
 
 import cartago.Op;
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.activities.*;
 
-public class EvWspActDispatch extends EvCtxEvent {
+public class EvWspActDispatch extends ECEvent {
 
     private Op op;
     private long actionId;
@@ -39,8 +39,8 @@ public class EvWspActDispatch extends EvCtxEvent {
         return actionId;
     }
     
-    public Optional<EvCtxActivity> getActivityToBegin() {
-        return Optional.of(new ActWspActOpDispatch(this));
+    public ECActivity[] getActivitiesToBegin() {
+    	return new ECActivity[] { new ActWspActOpDispatch(this) };
     }
     
     public EvAgExtActRequest getCausedByEvent() {

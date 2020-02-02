@@ -3,9 +3,9 @@ package jcmsim.events;
 import cartago.AgentId;
 import cartago.ArtifactId;
 import cartago.Op;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
 
-public class EvWspNewOpToExec extends EvCtxEvent {
+public class EvWspNewOpToExec extends ECEvent {
 
     private long actionId;
     private AgentId userId;

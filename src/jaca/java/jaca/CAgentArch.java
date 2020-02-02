@@ -63,6 +63,7 @@ import jason.asSyntax.Trigger.TEOperator;
 import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
+import jcmsim.PendingECEvent;
 import jcmsim.SimulationController;
 import jcmsim.events.EvAgExtActRequest;
 import jcmsim.events.EvArtObsStateEvent;
@@ -125,9 +126,17 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
             this.agent = getTS().getAg();
             this.belBase = agent.getBB();
 
+        	/* @SIMU */
+            SimulationController contr = SimulationController.getSimulationController();
+            contr.notifyECControlFlowStarted(Thread.currentThread());
+
             envSession = jaca.CartagoEnvironment.getInstance().startSession(agentName, this);
             implicitWspId = envSession.getJoinedWorkspaces().get(0);
             allJoinedWsp.addAll(envSession.getJoinedWorkspaces());
+
+            /* @SIMU */
+            contr.notifyECControlFlowFinished(Thread.currentThread());
+        
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.warning("[CARTAGO] WARNING: No default workspace found for " + agentName);
@@ -140,7 +149,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
     
         /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(this.getAgName(), new EvAgExtActRequest((ActionExec) actionExec));             
+        contr.notifyEventExecution(this.getAgName(), new EvAgExtActRequest((ActionExec) actionExec));             
 
 
         Structure action = actionExec.getActionTerm();
@@ -454,14 +463,14 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
         SimulationController contr = SimulationController.getSimulationController();
 
         try {
+
+        	
+        	PendingECEvent evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+        	contr.waitToExecEvent(evScheduled);
+        	
             CartagoEvent evt = envSession.fetchNextPercept();
 
             while (evt != null) {
-
-                /* @SIMU */
-                if (evt instanceof CartagoActionEvent) {
-                    contr.notifyNewEvent(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));                       
-                }
                 
                 if (evt instanceof ActionSucceededEvent) {
                     perceiveActionSucceeded((ActionSucceededEvent) evt);
@@ -478,7 +487,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                     perceiveAddedOP(ev);
                     perceiveRemovedOP(ev);
                     
-                    contr.notifyNewEvent(this.getAgName(), new jcmsim.events.EvAgBBUpdatedFromPercept(ev));                     
+                    contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgBBUpdatedFromPercept(ev));                     
 
                 } else if (evt instanceof ObsArtListChangedEvent) {
                     /* experimental */
@@ -494,6 +503,16 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                         this.removeObsPropertiesBel(info.getTargetArtifact(), info.getObsProperties(), Literal.DefaultNS);
                     }
                 }
+                
+                /* @SIMU */
+                if (evt instanceof CartagoActionEvent) {
+                    contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));                       
+                }
+                
+                
+                evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+            	contr.waitToExecEvent(evScheduled);
+                
                 evt = envSession.fetchNextPercept();
             }
         } catch (Exception ex) {

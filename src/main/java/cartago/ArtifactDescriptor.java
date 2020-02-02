@@ -148,8 +148,8 @@ public class ArtifactDescriptor {
                                     
                                     ArtifactObsEvent ev1 = (ArtifactObsEvent) ev;
                                     SimulationController contr = SimulationController.getSimulationController();
-                                    contr.notifyNewEvent(((ArtifactObsEvent) ev).getArtifactId().getName(), new EvArtObsStateEvent(ev1));
-                                    contr.notifyNewEvent(ev1.getArtifactId().getWorkspaceId().getName(), new EvWspObsStateDispatch(ev1, obs.getAgentId()));
+                                    contr.notifyEventExecution(((ArtifactObsEvent) ev).getArtifactId().getName(), new EvArtObsStateEvent(ev1));
+                                    contr.notifyEventExecution(ev1.getArtifactId().getWorkspaceId().getName(), new EvWspObsStateDispatch(ev1, obs.getAgentId()));
                                     
                                     obs.getListener().notifyCartagoEvent(ev);
                                 }

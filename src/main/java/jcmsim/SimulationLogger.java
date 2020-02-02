@@ -2,7 +2,7 @@ package jcmsim;
 
 import java.util.List;
 
-import jcmsim.EvCtx.EvCtxType;
+import jcmsim.ExecContext.ECType;
 
 public class SimulationLogger extends Thread {
 
@@ -14,10 +14,10 @@ public class SimulationLogger extends Thread {
         this.view = view;
     }
     
-    private String getTypeName(EvCtx.EvCtxType type) {
-        if (type.equals(EvCtxType.AGENT)) {
+    private String getTypeName(ExecContext.ECType type) {
+        if (type.equals(ECType.AGENT)) {
             return "AGENT: ";
-        } else if (type.equals(EvCtxType.ARTIFACT)) {
+        } else if (type.equals(ECType.ARTIFACT)) {
             return "ARTIFACT: ";
         } else {
             return "WORKSPACE: ";
@@ -31,31 +31,35 @@ public class SimulationLogger extends Thread {
                 long t0 = System.currentTimeMillis();
                 try {
                     logger.reset();
-                    StringBuffer sb = new StringBuffer();
+                    StringBuffer sbEvents = new StringBuffer();
+                    StringBuffer sbReport = new StringBuffer();
                     
-                    for (EvCtx ev: contr.getContexts()) {
-                        sb.append("------------------------------------\n");
-                        sb.append( ev.getType() + ": " + ev.getId() + "\n\n");
-                        sb.append("Activities: \n");
-                        List<EvCtxActivity> h1 = ev.getActivityHistory();
-                        for (EvCtxActivity act: h1) {
+                    for (ExecContext ec: contr.getContexts()) {
+                        sbEvents.append("------------------------------------\n");
+                        sbEvents.append( ec.getType() + ": " + ec.getId() + "\n\n");
+                        sbEvents.append("Activities: \n");
+                        List<ECActivity> h1 = ec.getActivityHistory();
+                        for (ECActivity act: h1) {
                             if (!act.isPending()) {
-                                String msg = "[" + act.getBeginEvent().getTime()+"] " + act + " duration: " + act.getDuration() + " ms";
-                                sb.append(msg + "\n");
+                                String msg = "[" + act.getBeginEvent().getTime()+"] " + act + " duration: " + act.getDuration() + " ms ( " + act.getDurationInMicroSec() + " us )";
+                                sbEvents.append(msg + "\n");
                             }
                         }
-                        sb.append("\nEvents: \n");
-                        List<EvCtxEvent> h2 = ev.getEventHistory();
-                        for (EvCtxEvent e: h2) {
+                        sbEvents.append("\nEvents: \n");
+                        List<ECEvent> h2 = ec.getEventHistory();
+                        for (ECEvent e: h2) {
                             String msg = "[" + e.getTime()+"] " + e;
-                            sb.append(msg + "\n");
+                            sbEvents.append(msg + "\n");
                         }
-                        sb.append("------------------------------------\n");
+                        sbEvents.append("------------------------------------\n");
+                        
+                        sbReport.append( ec.getType() + ": " + ec.getId()  + " | time: " + ec.getCurrentTime() + "\n");
                     }
                     
-                    String st = sb.toString();
+                    String st = sbEvents.toString();
                     logger.log(st);
-                    view.update(st);
+                    view.updateEvents(st);
+                    view.updateReport(sbReport.toString());
                     
                 } catch (Exception ex) {
                     ex.printStackTrace();

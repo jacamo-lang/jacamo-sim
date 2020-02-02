@@ -22,7 +22,7 @@ import jason.mas2j.ClassParameters;
 import jason.runtime.RuntimeServices;
 import jason.runtime.Settings;
 import jason.util.Config;
-import jcmsim.EvCtx.EvCtxType;
+import jcmsim.ExecContext.ECType;
 import jcmsim.SimulationController;
 
 /**
@@ -87,7 +87,7 @@ public class CentralisedAgArch extends AgArch implements Runnable {
 
             /* @SIMU */
             SimulationController contr = SimulationController.getSimulationController();
-            contr.createNewTContext(this.agName, EvCtxType.AGENT, System.currentTimeMillis());
+            contr.createNewExecContext(this.agName, ECType.AGENT, System.currentTimeMillis());
             
         } catch (Exception e) {
             running = false;
@@ -223,17 +223,21 @@ public class CentralisedAgArch extends AgArch implements Runnable {
         SimulationController contr = SimulationController.getSimulationController();
         
         long num = getUserAgArch().getCycleNumber();
-        contr.notifyNewEvent(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCBegin(num));
+        contr.notifyEventExecution(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCBegin(num));
 
         sense();
         deliberate();
         act();
 
-        contr.notifyNewEvent(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCEnd(num));
+        contr.notifyEventExecution(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCEnd(num));
     }
 
     public void run() {
-        TransitionSystem ts = getTS();
+    	/* @SIMU */
+        SimulationController contr = SimulationController.getSimulationController();
+        contr.notifyECControlFlowStarted(Thread.currentThread());
+        
+    	TransitionSystem ts = getTS();
         while (running) {
             if (ts.getSettings().isSync()) {
                 waitSyncSignal();

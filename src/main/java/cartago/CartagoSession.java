@@ -9,7 +9,8 @@ import java.util.concurrent.atomic.*;
 import cartago.events.*;
 import cartago.util.agent.ArtifactObsProperty;
 import jason.asSemantics.ActionExec;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
+import jcmsim.PendingECEvent;
 import jcmsim.SimulationController;
 import jcmsim.events.EvAgExtActRequest;
 import jcmsim.events.EvWspActDispatch;
@@ -75,7 +76,7 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(aid.getWorkspaceId().getName(), actId, aid.getName(), op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(aid.getWorkspaceId().getName(), evc);              
+                contr.notifyEventExecution(aid.getWorkspaceId().getName(), evc);              
 
                 ctx.doAction(actId, aid.getName(), op, test, timeout);
                 return actId;
@@ -98,7 +99,7 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspId.getName(), actId, artName, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspId.getName(), evc);             
+                contr.notifyEventExecution(wspId.getName(), evc);             
                 
                 ctx.doAction(actId, artName, op, test, timeout);
                 return actId;
@@ -126,7 +127,7 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspName, actId, artName, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspName, evc);             
+                contr.notifyEventExecution(wspName, evc);             
                 
                 ctx.doAction(actId, artName, op, test, timeout);
                 return actId;
@@ -148,7 +149,7 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspId.getName(), actId, null, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspId.getName(), evc);             
+                contr.notifyEventExecution(wspId.getName(), evc);             
                 
                 ctx.doAction(actId, op, test, timeout);
                 return actId;
@@ -176,7 +177,7 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
                 EvAgExtActRequest ev = (EvAgExtActRequest) contr.getLastEvent(this.credential.getId());
                 EvWspActDispatch evc = new EvWspActDispatch(wspName, actId, null, op, ev);
                 ev.setCausedEvent(evc);
-                contr.notifyNewEvent(wspName, evc);             
+                contr.notifyEventExecution(wspName, evc);             
 
                 
                 ctx.doAction(actId, op, test, timeout);
@@ -265,7 +266,12 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         // System.out.println("NOTIFIED "+ev.getId()+"
         // "+ev.getClass().getCanonicalName());
         
+    	/* 
+    	 * @SIMU 
+    	 */
         SimulationController contr = SimulationController.getSimulationController();
+        
+        PendingECEvent evScheduled = null;
         
         if (ev instanceof CartagoActionEvent) {
             /* find the wsp from the artifact id */
@@ -273,17 +279,18 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
             long actId = ae.getActionId();
             
             String agentName = this.credential.getId();
-            List<EvCtxEvent> h = contr.getEventHistory(agentName);
+            List<ECEvent> h = contr.getEventHistory(agentName);
 
             if (h != null) {
                 for (int i = h.size() - 1; i >= 0; i--) {
-                    EvCtxEvent e = h.get(i);
+                    ECEvent e = h.get(i);
                     if (e instanceof EvAgExtActRequest) {
                         EvAgExtActRequest req = (EvAgExtActRequest) e;
                         if (req.getCausedEvent().getActionId() == actId) {
                             EvWspActDispatch disp = req.getCausedEvent();
-                            contr.notifyNewEvent(disp.getWspName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));                       
-                            contr.notifyNewEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));                    
+                            
+                            contr.notifyEventExecution(disp.getWspName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));                       
+                            evScheduled = contr.scheduleEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));                    
                             break;
                         }
                     }
@@ -293,8 +300,9 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         } else if (ev instanceof ArtifactObsEvent) {
             /* find the wsp from the artifact id */
             ArtifactObsEvent oe = (ArtifactObsEvent) ev;
-            contr.notifyNewEvent(oe.getArtifactId().getWorkspaceId().getName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));           
-            contr.notifyNewEvent(this.credential.getId(), new jcmsim.events.EvAgNewPerceptNotified(ev));                    
+            
+            contr.notifyEventExecution(oe.getArtifactId().getWorkspaceId().getName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));           
+            evScheduled = contr.scheduleEvent(oe.getArtifactId().getWorkspaceId().getName(), new jcmsim.events.EvWspPerceptDispatch(ev, this.credential.getId()));           
         }
         
         checkWSPEvents(ev);
@@ -303,6 +311,11 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
             keepEvent = agentArchListener.notifyCartagoEvent(ev);
         }
         if (keepEvent) {
+        	
+        	if (evScheduled != null) {
+        		contr.waitToExecEvent(evScheduled);
+        	}
+        	
             perceptQueue.add(ev);
         }
     }

@@ -1,19 +1,19 @@
 package jcmsim.activities;
 
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.events.EvAgBBUpdatedFromPercept;
 import jcmsim.events.EvAgNewPerceptNotified;
 import jcmsim.events.EvWspActDispatch;
 import jcmsim.events.EvWspNewOpToExec;
 
-public class ActAgPercToBel extends EvCtxActivity {
+public class ActAgPercToBel extends ECActivity {
     
     public ActAgPercToBel(EvAgNewPerceptNotified ev){
         super(ev);
     }
 
-    public boolean checkAndAppyCompletion(EvCtxEvent ev) {
+    public boolean checkAndAppyCompletion(ECEvent ev) {
         if (ev instanceof EvAgBBUpdatedFromPercept) {
             EvAgBBUpdatedFromPercept ev2 = (EvAgBBUpdatedFromPercept) ev;
             if (((EvAgNewPerceptNotified) this.getBeginEvent()).getPercept().getId() == ev2.getArtifactObsEvent().getId()){

@@ -1,16 +1,16 @@
 package jcmsim.activities;
 
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.events.*;
 
-public class ActWspObsStatePerceptDispatch extends EvCtxActivity {
+public class ActWspObsStatePerceptDispatch extends ECActivity {
     
     public ActWspObsStatePerceptDispatch(EvWspObsStateDispatch ev){
         super(ev);
     }
 
-    public boolean checkAndAppyCompletion(EvCtxEvent ev) {
+    public boolean checkAndAppyCompletion(ECEvent ev) {
         if (ev instanceof EvWspObsStateDispatch) {
             
             EvWspPerceptDispatch ev2 = (EvWspPerceptDispatch) ev;

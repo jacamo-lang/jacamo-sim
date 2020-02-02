@@ -3,9 +3,9 @@ package jcmsim.events;
 import cartago.ArtifactId;
 import cartago.Op;
 import cartago.Tuple;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
 
-public class EvArtOpExecEnd extends EvCtxEvent {
+public class EvArtOpExecEnd extends ECEvent {
     
     private long actionId;
     private ArtifactId aid;
@@ -52,6 +52,7 @@ public class EvArtOpExecEnd extends EvCtxEvent {
     public Op getOp() {
         return op;
     }
+    
 
     public String toString() {
         if (failureMsg == null && failureReason == null) {

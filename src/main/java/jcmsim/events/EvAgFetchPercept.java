@@ -7,11 +7,11 @@ import jcmsim.ECEvent;
 import jcmsim.activities.ActAgRC;
 import jcmsim.activities.ActAgRCFetchPercept;
 
-public class EvAgRCBegin extends ECEvent {
+public class EvAgFetchPercept extends ECEvent {
 
     private long numCycle;
     
-    public EvAgRCBegin(long numCycle) {
+    public EvAgFetchPercept(long numCycle) {
         this.numCycle = numCycle;
     }
     
@@ -19,15 +19,12 @@ public class EvAgRCBegin extends ECEvent {
         return numCycle;
     }
     
-    public ECActivity[] getActivitiesToBegin() {
-    	return new ECActivity[] { new ActAgRC(this), new ActAgRCFetchPercept(this) };
-    }
-
     public boolean isActivityEnd() {
         return true;
     }
 
+
     public String toString() {
-        return "[event: reasoning cycle begin | num-cycle: " + numCycle + " ]";
+        return "[event: fetch percept | num-cycle: " + numCycle + " ]";
     }
 }

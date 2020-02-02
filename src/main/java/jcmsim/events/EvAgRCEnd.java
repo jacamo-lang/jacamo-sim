@@ -2,12 +2,12 @@ package jcmsim.events;
 
 import java.util.Optional;
 
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.activities.ActAgBetweenRC;
 import jcmsim.activities.ActAgRC;
 
-public class EvAgRCEnd extends EvCtxEvent {
+public class EvAgRCEnd extends ECEvent {
 
     private long numCycle;
     
@@ -23,8 +23,8 @@ public class EvAgRCEnd extends EvCtxEvent {
         return true;
     }
 
-    public Optional<EvCtxActivity> getActivityToBegin() {
-        return Optional.of(new ActAgBetweenRC(this));
+    public ECActivity[] getActivitiesToBegin() {
+    	return new ECActivity[] { new ActAgBetweenRC(this) };
     }
     
     public String toString() {

@@ -4,9 +4,9 @@ import java.util.Date;
 
 import cartago.AgentId;
 import cartago.CartagoEvent;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
 
-public class EvWspPerceptDispatch extends EvCtxEvent {
+public class EvWspPerceptDispatch extends ECEvent {
 
     private CartagoEvent ev;
     private String agentId;

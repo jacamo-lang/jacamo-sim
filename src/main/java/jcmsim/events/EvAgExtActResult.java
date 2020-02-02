@@ -2,9 +2,9 @@ package jcmsim.events;
 
 import cartago.events.ActionSucceededEvent;
 import cartago.events.CartagoActionEvent;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
 
-public class EvAgExtActResult extends EvCtxEvent {
+public class EvAgExtActResult extends ECEvent {
     
     private CartagoActionEvent ev;
     

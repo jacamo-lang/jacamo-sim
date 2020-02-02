@@ -1,8 +1,8 @@
 package cartago;
 
-import jcmsim.EvCtxEvent;
+import jcmsim.ECEvent;
 
-public class EvEnvNewOpToExec extends EvCtxEvent {
+public class EvEnvNewOpToExec extends ECEvent {
 
     private WorkspaceId wid;
     private long actionId;

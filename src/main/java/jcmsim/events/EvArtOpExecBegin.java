@@ -3,11 +3,11 @@ package jcmsim.events;
 import java.util.Optional;
 
 import cartago.*;
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.activities.ActArtOpExec;
 
-public class EvArtOpExecBegin extends EvCtxEvent{
+public class EvArtOpExecBegin extends ECEvent{
 
     private ArtifactId aid;
     private OpExecutionFrame info;
@@ -18,8 +18,8 @@ public class EvArtOpExecBegin extends EvCtxEvent{
     }
     
 
-    public Optional<EvCtxActivity> getActivityToBegin() {
-        return Optional.of(new ActArtOpExec(this));
+    public ECActivity[] getActivitiesToBegin() {
+    	return new ECActivity[] { new ActArtOpExec(this) };
     }
 
 

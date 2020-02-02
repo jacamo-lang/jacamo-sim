@@ -11,24 +11,32 @@ import javax.swing.SwingUtilities;
 
 public class SimulationView extends JFrame  {      
     
-    private SimuViewerFrame frame;
+    private EventFrame eventsFrame;
+    private ReportFrame reportFrame;
     
     public SimulationView(){
-        frame = new SimuViewerFrame();
-        frame.setVisible(true);
+        eventsFrame = new EventFrame();
+        eventsFrame.setVisible(true);
+        
+        reportFrame = new ReportFrame();
+        reportFrame.setVisible(true);
     }
     
-    public void update(String s){
-        frame.update(s);
+    public void updateEvents(String s){
+        eventsFrame.update(s);
+    }
+
+    public void updateReport(String s){
+        reportFrame.update(s);
     }
     
-    class SimuViewerFrame extends JFrame {
+    class EventFrame extends JFrame {
 
         private JTextArea text;
         private boolean updateBlocked;
 
-        public SimuViewerFrame() {
-            setTitle("Simulation Viewer");
+        public EventFrame() {
+            setTitle("Simulation Viewer | Events and Activities");
             setSize(1000,600);
             
             updateBlocked = false;
@@ -62,5 +70,34 @@ public class SimulationView extends JFrame  {
         }
         
     }
+    
+    class ReportFrame extends JFrame {
+
+        private JTextArea text;
+        private boolean updateBlocked;
+
+        public ReportFrame() {
+            setTitle("Simulation Viewer | Report");
+			setSize(600, 600);
+            
+            JPanel panel = new JPanel();
+            setContentPane(panel);
+            
+            text = new JTextArea(30,40);
+            JScrollPane scrollPane = new JScrollPane(text); 
+
+            text.setEditable(false);
+            panel.add(scrollPane);        
+        }
+        
+        public void update(String s){
+            if (!updateBlocked) {
+                SwingUtilities.invokeLater(() -> {
+                    text.setText(s);
+                });
+            }
+        }
+        
+    }    
 }
 

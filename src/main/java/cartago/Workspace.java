@@ -45,7 +45,10 @@ import cartago.security.IWorkspaceSecurityManager;
 import cartago.security.NullSecurityManager;
 import cartago.security.SecurityException;
 import jcmsim.SimulationController;
-import jcmsim.EvCtx.EvCtxType;
+import jcmsim.ECEvent;
+import jcmsim.ExecContext.ECType;
+import jcmsim.PendingECEvent;
+import jcmsim.events.EvArtOpEnqueued;
 import jcmsim.events.EvWspNewOpToExec;
 
 
@@ -111,7 +114,7 @@ public class Workspace {
         
         /* @SIMU */
         SimulationController contr = SimulationController.getSimulationController();
-        contr.createNewTContext(id.getName(), EvCtxType.WORKSPACE, System.currentTimeMillis());
+        contr.createNewExecContext(id.getName(), ECType.WORKSPACE, System.currentTimeMillis());
         
         this.id = id;
         this.desc = desc;
@@ -1009,7 +1012,7 @@ public class Workspace {
          * @SIMU
          */
         SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyNewEvent(this.id.toString(), new EvWspNewOpToExec(actionId, userId, arId, arName, op));
+        contr.notifyEventExecution(this.id.toString(), new EvWspNewOpToExec(actionId, userId, arId, arName, op));
         
         
         if (isShutdown){
@@ -1088,6 +1091,15 @@ public class Workspace {
                 OpId oid = des.getAdapter().getFreshId(op.getName(),userId);
                 OpExecutionFrame info = new OpExecutionFrame(this,oid,ctx, actionId, userId, aid,op,timeout,test);
                 try {
+                	
+                	// @SIMU
+                	
+                	ECEvent scheduledEvent = new EvArtOpEnqueued(info);
+                	PendingECEvent schedEv = contr.scheduleEvent(aid.getName(), scheduledEvent);
+                	
+                	contr.waitToExecEvent(schedEv);
+                	
+                	
                     opTodo.put(info);
                     return;
                 } catch (Exception ex){
@@ -1106,6 +1118,7 @@ public class Workspace {
                 OpId oid = des.getAdapter().getFreshId(request.getOp().getName(),userId);
                 OpExecutionFrame frame = new OpExecutionFrame(this,oid,ctx, actionId, userId, aid, request.getOp(), timeout, test);
                 try {
+                	
                     opTodo.put(frame);
                     return;
                 } catch (Exception ex){
@@ -1801,10 +1814,17 @@ public class Workspace {
         }
 
         public void run(){
+        	/* @SIMU */
+            SimulationController contr = SimulationController.getSimulationController();
+
             stopped = false;
             while (!isStopped()){
                 try {
-                    OpExecutionFrame item = opBuffer.take();        
+                    OpExecutionFrame item = opBuffer.take();  
+                    
+                	/* @SIMU */
+                    contr.notifyECControlFlowStarted(this);
+                    
                     //log("New job to do: "+item.getOpId());
                     item.setServingThread(Thread.currentThread());
                     env.serveOperation(item);
@@ -1817,6 +1837,9 @@ public class Workspace {
                     if (nfailures>10){
                         break;
                     }*/
+                } finally {
+                	/* @SIMU */
+                    contr.notifyECControlFlowFinished(this);
                 }
             }
 

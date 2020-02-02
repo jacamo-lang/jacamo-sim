@@ -1,18 +1,18 @@
 package jcmsim.activities;
 
 import cartago.OpExecutionFrame;
-import jcmsim.EvCtxActivity;
-import jcmsim.EvCtxEvent;
+import jcmsim.ECActivity;
+import jcmsim.ECEvent;
 import jcmsim.events.EvArtOpExecBegin;
 import jcmsim.events.EvArtOpExecEnd;
 
-public class ActArtOpExec extends EvCtxActivity {
+public class ActArtOpExec extends ECActivity {
     
     public ActArtOpExec(EvArtOpExecBegin ev){
         super(ev);
     }
 
-    public boolean checkAndAppyCompletion(EvCtxEvent ev) {
+    public boolean checkAndAppyCompletion(ECEvent ev) {
         if (ev instanceof EvArtOpExecEnd) {
             EvArtOpExecEnd ev2 = (EvArtOpExecEnd) ev;
             if (((EvArtOpExecBegin) this.getBeginEvent()).getInfo().getActionId() == ev2.getActionId()){
