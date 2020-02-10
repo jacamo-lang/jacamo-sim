@@ -17,9 +17,12 @@ public class EvArtOpExecBegin extends ECEvent{
         this.info = info; 
     }
     
-
     public ECActivity[] getActivitiesToBegin() {
         return new ECActivity[] { new ActArtOpExec(this) };
+    }
+
+    public boolean isActivityEnd() {
+        return true;
     }
 
 

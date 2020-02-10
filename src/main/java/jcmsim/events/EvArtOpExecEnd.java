@@ -3,7 +3,10 @@ package jcmsim.events;
 import cartago.ArtifactId;
 import cartago.Op;
 import cartago.Tuple;
+import jcmsim.ECActivity;
 import jcmsim.ECEvent;
+import jcmsim.activities.ActArtOpExec;
+import jcmsim.activities.ActArtOpResultDispatch;
 
 public class EvArtOpExecEnd extends ECEvent {
     
@@ -53,6 +56,9 @@ public class EvArtOpExecEnd extends ECEvent {
         return op;
     }
     
+    public ECActivity[] getActivitiesToBegin() {
+        return new ECActivity[] { new ActArtOpResultDispatch(this) };
+    }
 
     public String toString() {
         if (failureMsg == null && failureReason == null) {

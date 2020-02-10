@@ -44,7 +44,8 @@ import cartago.events.ObsArtListChangedEvent;
 import cartago.security.IWorkspaceSecurityManager;
 import cartago.security.NullSecurityManager;
 import cartago.security.SecurityException;
-import jcmsim.SimulationController;
+import jcmsim.ExecutionController;
+import jcmsim.CausalLink;
 import jcmsim.ECEvent;
 import jcmsim.ExecContext.ECType;
 import jcmsim.PendingECEvent;
@@ -112,8 +113,8 @@ public class Workspace {
     public Workspace(WorkspaceId id, WorkspaceDescriptor desc, ICartagoLogger logger){
         
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.createNewExecContext(id.getName(), ECType.WORKSPACE, System.currentTimeMillis());
+        ExecutionController contr = ExecutionController.getExecController();
+        contr.notifyNewExecContext(id.getName(), ECType.WORKSPACE, System.currentTimeMillis());
         
         this.id = id;
         this.desc = desc;
@@ -1010,8 +1011,9 @@ public class Workspace {
         /*
          * @SIMU
          */
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyEventExecution(this.id.toString(), new EvWspNewOpToExec(actionId, userId, arId, arName, op));
+        ExecutionController contr = ExecutionController.getExecController();
+        ECEvent wspEv = new EvWspNewOpToExec(actionId, userId, arId, arName, op);
+        contr.notifyEventExec(this.id.toString(), wspEv);
         
         
         if (isShutdown){
@@ -1093,13 +1095,12 @@ public class Workspace {
                     
                     // @SIMU
                     
-                    ECEvent scheduledEvent = new EvArtOpEnqueued(info);
-                    PendingECEvent schedEv = contr.scheduleEvent(aid.getName(), scheduledEvent);
-                    
-                    contr.waitToExecEvent(schedEv);
-                    
-                    
+                    ECEvent eventToExec = new EvArtOpEnqueued(info);
+                    eventToExec.setCausingEvent(new CausalLink(wspEv, this.id.toString()));
+                    contr.readyToExecEvent(aid.getName(), eventToExec);
+                                        
                     opTodo.put(info);
+                    
                     return;
                 } catch (Exception ex){
                     ex.printStackTrace();
@@ -1595,11 +1596,14 @@ public class Workspace {
         }
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (aid != null) {
-        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(aid.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, aid.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
 
         listener.notifyCartagoEvent(ev);                        
     }
@@ -1608,11 +1612,14 @@ public class Workspace {
         ActionFailedEvent ev = eventRegistry.makeActionFailedEvent(id, actionId, failureMsg, failureReason, op);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (id != null) {
-        	contr.notifyEventExecution(id.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(id.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, id.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
         
         listener.notifyCartagoEvent(ev);
     }
@@ -1621,11 +1628,14 @@ public class Workspace {
         ActionSucceededEvent ev = eventRegistry.makeFocusActionSucceededEvent(actionId, aid, op, target, props);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (aid != null) {
-        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(aid.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, aid.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
      
         listener.notifyCartagoEvent(ev);
     }
@@ -1635,11 +1645,14 @@ public class Workspace {
         ActionSucceededEvent ev = eventRegistry.makeStopFocusActionSucceededEvent(actionId, aid, op, target, props);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (aid != null) {
-        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(aid.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, aid.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
         
         listener.notifyCartagoEvent(ev);
     }
@@ -1648,11 +1661,14 @@ public class Workspace {
         ActionSucceededEvent ev = eventRegistry.makeJoinWSPSucceededEvent(actionId, aid, op, wspId, ctx);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (aid != null) {
-        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(aid.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, aid.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
 
         listener.notifyCartagoEvent(ev);
     }
@@ -1661,11 +1677,14 @@ public class Workspace {
         ActionSucceededEvent ev = eventRegistry.makeQuitWSPSucceededEvent(actionId, aid, op, wspId);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (aid != null) {
-        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(aid.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, aid.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
 
         listener.notifyCartagoEvent(ev);
     }
@@ -1674,11 +1693,14 @@ public class Workspace {
         ActionSucceededEvent ev = eventRegistry.makeConsultManualSucceededEvent(actionId, aid, op, man);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         if (aid != null) {
-        	contr.notifyEventExecution(aid.toString(), new EvArtActionEventDispatch(ev));
+            ECEvent causingEv = new EvArtActionEventDispatch(ev);
+        	contr.notifyEventExec(aid.toString(), causingEv);
+        	ECEvent causedEv = new EvWspActionEventDispatch(ev);
+        	causedEv.setCausingEvent(new CausalLink(causingEv, aid.toString()));
+            contr.notifyEventExec(this.id.getName(), causedEv);
         }
-        contr.notifyEventExecution(this.id.getName(), new EvWspActionEventDispatch(ev));
 
         listener.notifyCartagoEvent(ev);
     }
@@ -1870,7 +1892,7 @@ public class Workspace {
 
         public void run(){
             /* @SIMU */
-            SimulationController contr = SimulationController.getSimulationController();
+            ExecutionController contr = ExecutionController.getExecController();
 
             stopped = false;
             while (!isStopped()){

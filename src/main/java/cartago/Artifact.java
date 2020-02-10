@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.locks.*;
 import java.util.logging.LogManager;
 
-import jcmsim.SimulationController;
+import jcmsim.ExecutionController;
 import jcmsim.ExecContext.ECType;
 import jcmsim.events.EvArtOpExecBegin;
 import jcmsim.events.EvArtOpExecEnd;
@@ -78,8 +78,8 @@ public abstract class Artifact {
         opIds = new java.util.concurrent.atomic.AtomicInteger(0);
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.createNewExecContext(id.getName(), ECType.ARTIFACT, System.currentTimeMillis());
+        ExecutionController contr = ExecutionController.getExecController();
+        contr.notifyNewExecContext(id.getName(), ECType.ARTIFACT, System.currentTimeMillis());
 
         
         lock = new ReentrantLock(true);
@@ -331,8 +331,8 @@ public abstract class Artifact {
         /*
          * @SIMU
          */
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyEventExecution(this.id.toString(), new EvArtOpExecBegin(this.id, info));
+        ExecutionController contr = ExecutionController.getExecController();
+        contr.notifyEventExec(this.id.toString(), new EvArtOpExecBegin(this.id, info));
         
         
         ICartagoLoggerManager log = wsp.getLoggerManager();
@@ -442,7 +442,7 @@ public abstract class Artifact {
                             if (!info.completionNotified()){
                             	
                                 /* @SIMU */
-                                contr.notifyEventExecution(this.id.getName(), new EvArtOpExecEnd(info.getActionId(), id, op));
+                                contr.notifyEventExec(this.id.getName(), new EvArtOpExecEnd(info.getActionId(), id, op));
                                                             	
                                 info.notifyOpCompletion();
                             }
@@ -456,7 +456,7 @@ public abstract class Artifact {
                             obsPropertyMap.rollbackChanges();
 
                             /* @SIMU */
-                            contr.notifyEventExecution(id.getName(), new EvArtOpExecEnd(info.getActionId(), id, op, msg, desc));
+                            contr.notifyEventExec(id.getName(), new EvArtOpExecEnd(info.getActionId(), id, op, msg, desc));
                             
                             info.notifyOpFailed();
                         }

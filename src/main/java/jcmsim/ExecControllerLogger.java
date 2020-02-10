@@ -4,12 +4,12 @@ import java.util.List;
 
 import jcmsim.ExecContext.ECType;
 
-public class SimulationLogger extends Thread {
+public class ExecControllerLogger extends Thread {
 
-    private SimulationController contr;
-    private SimulationView view;
+    private ExecutionController contr;
+    private ExecControllerView view;
     
-    public SimulationLogger(SimulationController contr, SimulationView view) {
+    public ExecControllerLogger(ExecutionController contr, ExecControllerView view) {
         this.contr = contr;
         this.view = view;
     }
@@ -64,8 +64,10 @@ public class SimulationLogger extends Thread {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }               
-                long t1 = System.currentTimeMillis();
-                Thread.sleep(2000 - (t1 - t0));             
+                long sleepTime = 2000 - (System.currentTimeMillis() - t0);
+                if (sleepTime > 0) {
+                	Thread.sleep(sleepTime);             
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

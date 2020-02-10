@@ -9,12 +9,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-public class SimulationView extends JFrame  {      
+public class ExecControllerView extends JFrame  {      
     
     private EventFrame eventsFrame;
     private ReportFrame reportFrame;
     
-    public SimulationView(){
+    public ExecControllerView(){
         eventsFrame = new EventFrame();
         eventsFrame.setVisible(true);
         

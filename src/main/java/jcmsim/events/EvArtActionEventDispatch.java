@@ -15,6 +15,10 @@ public class EvArtActionEventDispatch extends ECEvent {
     	return ev;
     }
     
+    public boolean isActivityEnd() {
+        return true;
+    }
+
     public String toString() {
     	return "[event: action event dispatch | act-id: " + ev.getActionId() + " | "+ ev.getOp().getName() +" ]";
     }

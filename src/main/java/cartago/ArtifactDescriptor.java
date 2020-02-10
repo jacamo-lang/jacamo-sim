@@ -19,7 +19,9 @@ package cartago;
 
 import java.util.*;
 import cartago.events.*;
-import jcmsim.SimulationController;
+import jcmsim.CausalLink;
+import jcmsim.ECEvent;
+import jcmsim.ExecutionController;
 import jcmsim.events.EvArtObsStateEvent;
 import jcmsim.events.EvWspObsStateDispatch;
 
@@ -147,9 +149,12 @@ public class ArtifactDescriptor {
                                 	
                                     /* @SIMU */                                    
                                     ArtifactObsEvent ev1 = (ArtifactObsEvent) ev;
-                                    SimulationController contr = SimulationController.getSimulationController();
-                                    contr.notifyEventExecution(((ArtifactObsEvent) ev).getArtifactId().getName(), new EvArtObsStateEvent(ev1));
-                                    contr.notifyEventExecution(ev1.getArtifactId().getWorkspaceId().getName(), new EvWspObsStateDispatch(ev1, obs.getAgentId()));
+                                    ExecutionController contr = ExecutionController.getExecController();
+                                    ECEvent causingEv = new EvArtObsStateEvent(ev1);
+                                    contr.notifyEventExec(((ArtifactObsEvent) ev).getArtifactId().getName(), causingEv);
+                                    ECEvent causedEv = new EvWspObsStateDispatch(ev1, obs.getAgentId());
+                                    causedEv.setCausingEvent(new CausalLink(causingEv, ((ArtifactObsEvent) ev).getArtifactId().getName()));
+                                    contr.notifyEventExec(ev1.getArtifactId().getWorkspaceId().getName(), causedEv);
                                     
                                     obs.getListener().notifyCartagoEvent(ev);
                                 }
@@ -182,9 +187,12 @@ public class ArtifactDescriptor {
                                     	
                                         /* @SIMU */                                    
                                         ArtifactObsEvent ev1 = (ArtifactObsEvent) ev;
-                                        SimulationController contr = SimulationController.getSimulationController();
-                                        contr.notifyEventExecution(((ArtifactObsEvent) ev).getArtifactId().getName(), new EvArtObsStateEvent(ev1));
-                                        contr.notifyEventExecution(ev1.getArtifactId().getWorkspaceId().getName(), new EvWspObsStateDispatch(ev1, obs.getAgentId()));
+                                        ExecutionController contr = ExecutionController.getExecController();
+                                        ECEvent causingEv = new EvArtObsStateEvent(ev1);
+                                        contr.notifyEventExec(((ArtifactObsEvent) ev).getArtifactId().getName(), causingEv);
+                                        ECEvent causedEv = new EvWspObsStateDispatch(ev1, obs.getAgentId());
+                                        causedEv.setCausingEvent(new CausalLink(causingEv, ((ArtifactObsEvent) ev).getArtifactId().getName()));
+                                        contr.notifyEventExec(ev1.getArtifactId().getWorkspaceId().getName(), causedEv);
                                     	
                                         obs.getListener().notifyCartagoEvent(ev);
                                     }

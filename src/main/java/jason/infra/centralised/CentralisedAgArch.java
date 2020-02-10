@@ -23,7 +23,7 @@ import jason.runtime.RuntimeServices;
 import jason.runtime.Settings;
 import jason.util.Config;
 import jcmsim.ExecContext.ECType;
-import jcmsim.SimulationController;
+import jcmsim.ExecutionController;
 
 /**
  * This class provides an agent architecture when using Centralised
@@ -86,8 +86,8 @@ public class CentralisedAgArch extends AgArch implements Runnable {
             
 
             /* @SIMU */
-            SimulationController contr = SimulationController.getSimulationController();
-            contr.createNewExecContext(this.agName, ECType.AGENT, System.currentTimeMillis());
+            ExecutionController contr = ExecutionController.getExecController();
+            contr.notifyNewExecContext(this.agName, ECType.AGENT, System.currentTimeMillis());
             
         } catch (Exception e) {
             running = false;
@@ -220,21 +220,21 @@ public class CentralisedAgArch extends AgArch implements Runnable {
     protected void reasoningCycle() {
 
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         
         long num = getUserAgArch().getCycleNumber();
-        contr.notifyEventExecution(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCBegin(num));
+        contr.notifyEventExec(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCBegin(num));
 
         sense();
         deliberate();
         act();
 
-        contr.notifyEventExecution(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCEnd(num));
+        contr.notifyEventExec(getUserAgArch().getAgName(), new jcmsim.events.EvAgRCEnd(num));
     }
 
     public void run() {
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
         contr.notifyECControlFlowStarted(Thread.currentThread());
         
         TransitionSystem ts = getTS();

@@ -11,6 +11,10 @@ public abstract class ECActivity {
         this.beginEvent = beginEvent;
     }
     
+    public String getName() {
+    	return this.getClass().getSimpleName();
+    }
+
     public void setEndEvent(ECEvent endEvent) {
         this.endEvent = endEvent;
     }

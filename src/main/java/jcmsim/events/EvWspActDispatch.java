@@ -12,14 +12,12 @@ public class EvWspActDispatch extends ECEvent {
     private Op op;
     private long actionId;
     private String aid;
-    private EvAgExtActRequest causedByEvent;
     private String wspName;
     
-    public EvWspActDispatch(String wspName, long actionId, String aid, Op op, EvAgExtActRequest causedByEvent) {
+    public EvWspActDispatch(String wspName, long actionId, String aid, Op op) {
         this.actionId = actionId;
         this.op = op;
         this.aid = aid;
-        this.causedByEvent = causedByEvent;
         this.wspName = wspName;
     }
     
@@ -43,10 +41,6 @@ public class EvWspActDispatch extends ECEvent {
         return new ECActivity[] { new ActWspActOpDispatch(this) };
     }
     
-    public EvAgExtActRequest getCausedByEvent() {
-        return causedByEvent;
-    }
-
     
     public String toString() {
         if (aid != null) {

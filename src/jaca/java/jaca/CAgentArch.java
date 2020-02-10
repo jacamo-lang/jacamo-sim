@@ -64,7 +64,7 @@ import jason.asSyntax.Trigger.TEType;
 import jason.asSyntax.parser.ParseException;
 import jason.bb.BeliefBase;
 import jcmsim.PendingECEvent;
-import jcmsim.SimulationController;
+import jcmsim.ExecutionController;
 import jcmsim.events.EvAgExtActRequest;
 import jcmsim.events.EvArtObsStateEvent;
 
@@ -127,7 +127,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
             this.belBase = agent.getBB();
 
             /* @SIMU */
-            SimulationController contr = SimulationController.getSimulationController();
+            ExecutionController contr = ExecutionController.getExecController();
             contr.notifyECControlFlowStarted(Thread.currentThread());
 
             envSession = jaca.CartagoEnvironment.getInstance().startSession(agentName, this);
@@ -148,8 +148,8 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
         // logger.info("NEW ACTION  "+actionExec.getActionTerm()+" agent: "+this.getAgName());
     
         /* @SIMU */
-        SimulationController contr = SimulationController.getSimulationController();
-        contr.notifyEventExecution(this.getAgName(), new EvAgExtActRequest((ActionExec) actionExec));             
+        ExecutionController contr = ExecutionController.getExecController();
+        contr.notifyEventExec(this.getAgName(), new EvAgExtActRequest((ActionExec) actionExec));             
 
 
         Structure action = actionExec.getActionTerm();
@@ -460,13 +460,11 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
         if (envSession == null) // the init isn't finished yet...
             return super.perceive();
 
-        SimulationController contr = SimulationController.getSimulationController();
+        ExecutionController contr = ExecutionController.getExecController();
 
         try {
 
-            
-            PendingECEvent evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
-            contr.waitToExecEvent(evScheduled);
+            contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
             
             CartagoEvent evt = envSession.fetchNextPercept();
 
@@ -487,7 +485,7 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                     perceiveAddedOP(ev);
                     perceiveRemovedOP(ev);
                     
-                    contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgBelUpdatedFromPercept(ev));                     
+                    contr.notifyEventExec(this.getAgName(), new jcmsim.events.EvAgBelUpdatedFromPercept(ev));                     
 
                 } else if (evt instanceof ObsArtListChangedEvent) {
                     /* experimental */
@@ -506,11 +504,12 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                 
                 /* @SIMU */
                 if (evt instanceof CartagoActionEvent) {
-                    contr.notifyEventExecution(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));                       
+                    contr.notifyEventExec(this.getAgName(), new jcmsim.events.EvAgExtActResult((CartagoActionEvent) evt));                       
                 }
                 
-                evScheduled = contr.scheduleEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
-                contr.waitToExecEvent(evScheduled);
+                // next to perceive
+                
+                contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
                 
                 evt = envSession.fetchNextPercept();
             }
