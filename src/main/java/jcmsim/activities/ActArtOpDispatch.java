@@ -25,7 +25,7 @@ public class ActArtOpDispatch extends ECActivity {
     }
 
     public String toString() {
-        OpExecutionFrame info = ((EvArtOpExecBegin) this.getBeginEvent()).getInfo(); 
+        OpExecutionFrame info = ((EvArtOpExecBegin) this.getEndEvent()).getInfo(); 
         return "[activity: op dispatched | act-id: " + info.getActionId() + " | " + info.getOperation().getName() + " on " + info.getTargetArtifactId() + " by " + info.getAgentId().getAgentName() +"]";
     }
 

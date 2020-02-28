@@ -280,8 +280,6 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
          * @SIMU 
          */
         ExecutionController contr = ExecutionController.getExecController();
-        
-        // PendingECEvent evScheduled = null;
         jcmsim.events.EvAgNewPerceptNotified eventToExec = null;
         
         if (ev instanceof CartagoActionEvent) {
@@ -290,8 +288,8 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
             long actId = ae.getActionId();
             
             String agentName = this.credential.getId();
+            
             List<ECEvent> h = contr.getEventHistory(agentName);
-
             if (h != null) {
                 for (int i = h.size() - 1; i >= 0; i--) {
                     ECEvent e = h.get(i);
@@ -327,7 +325,8 @@ public class CartagoSession implements ICartagoSession, ICartagoCallback {
         }
         if (keepEvent) {
  
-        	contr.readyToExecEvent(this.credential.getId(), eventToExec);
+        	// contr.readyToExecEvent(this.credential.getId(), eventToExec);
+        	contr.notifyEventFromExternalCtx(this.credential.getId(), eventToExec);
             
             perceptQueue.add(ev);
         }

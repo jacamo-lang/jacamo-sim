@@ -1,30 +1,46 @@
-package ex1;
+package ex2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import jcmsim.*;
 
-class CentralizedSimulation extends Simulation {
 
-	private Random gen;
+class CentralizedSimulation extends Simulation {
+	
 	private long time;
+	private Random gen;
 	
 	public CentralizedSimulation() {
-		gen = new Random(1);
 		time = 0;
-		
+
+		gen = new Random(1);
+
 		try { 
 
+			// reasoning cycle (RC) duration
 			setActivityDuration("ActAgRC", (ECActivity act, ExecContext ctx) -> { 
-				 return 1000 + gen.nextInt(1000); 
+				 return 1000; 
+			});		
+			
+			setActivityDuration("ActCommMsgDispatch", (ECActivity act, ExecContext ctx) -> {
+				return 20000; // + gen.nextInt(500000);
+			});
+	
+			setActivityDuration("ActAgRCFetchPercept", (ECActivity act, ExecContext ctx) -> {
+				return 0; // + gen.nextInt(500000);
+			});
+			// inter-RC duration
+			
+			/*
+			setActivityDuration("ActAgBetweenRC", (ECActivity act, ExecContext ctx) -> { 
+				 return 500000; 
 			});		
 			
 			setActivityDuration("ActArtOpExec", (ECActivity act, ExecContext ctx) -> { 
-				  if (ctx.getId().equals("counter")) {
-					  return 5000 + gen.nextInt(1000); 
-				  } else {
-					  return 0;
-				  }
-			});		
+				 return 5000000; 
+			});
+			*/		
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -88,11 +104,10 @@ public class RunTest {
 		Simulation sim = new CentralizedSimulation();
 
 		ExecutionController contr = ExecutionController.getExecController();
-		// contr.initSimulationMode(sim);
-		contr.initTrackingMode();
+		contr.initSimulationMode(sim);
+		// contr.initTrackingMode();
 		
-		jason.infra.centralised.RunCentralisedMAS.main(new String[] { "src/test/jcmsim/example-1/main.mas2j" });
+		jason.infra.centralised.RunCentralisedMAS.main(new String[] { "src/test/jcmsim/example-2/main.mas2j" });
 	}
 
 }
-

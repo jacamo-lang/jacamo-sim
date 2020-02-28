@@ -3,6 +3,7 @@ package jcmsim.events;
 import java.util.Optional;
 
 import cartago.CartagoEvent;
+import cartago.events.ActionSucceededEvent;
 import cartago.events.ArtifactObsEvent;
 import cartago.events.CartagoActionEvent;
 import jcmsim.ECActivity;
@@ -31,7 +32,14 @@ public class EvAgNewPerceptNotified extends ECEvent {
     }
     
     public String toString() {
-        return "[event: new percept notified | percept id: " + ev.getId() + " | " + ev.getClass().getName() + "]";
-        
+        if (ev instanceof ArtifactObsEvent) {
+        	ArtifactObsEvent aev = (ArtifactObsEvent) ev;
+        	return "[event: new obs state notified | percept id: " + aev.getId() + " | " + aev.getArtifactId().getName() + " ]";
+        } else if (ev instanceof CartagoActionEvent){
+        	CartagoActionEvent caev = (CartagoActionEvent) ev;
+        	return "[event: new action event notified | action id: " + caev.getActionId() + " | " + caev.getOp().getName() + (caev instanceof ActionSucceededEvent ? " succeeded" : " failed") + " ]";
+        } else {
+        	return "[event: new percept notified | percept id: " + ev.getId() + " | " + ev.getClass().getName() + "]";
+        }
     }
 }

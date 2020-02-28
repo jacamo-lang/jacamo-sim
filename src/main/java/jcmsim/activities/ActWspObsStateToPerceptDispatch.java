@@ -23,7 +23,7 @@ public class ActWspObsStateToPerceptDispatch extends ECActivity {
     }
 
     public String toString() {
-        EvWspObsStateDispatch ev = (EvWspObsStateDispatch) this.getEndEvent();
+        EvWspObsStateDispatch ev = (EvWspObsStateDispatch) this.getBeginEvent();
         return "[activity: wsp obs state percept dispatch | ev-id: " + ev.getAgentId() + " | gen by " + ev.getArtObsEvent().getArtifactId().getName()  + " observed by " + ev.getAgentId()  +"]";
     }
 

@@ -1,12 +1,9 @@
 package jcmsim.events;
 
-import java.util.Optional;
 import jason.asSemantics.ActionExec;
 import jcmsim.ECActivity;
 import jcmsim.ECEvent;
 import jcmsim.activities.ActAgActionExec;
-import jcmsim.activities.ActAgRC;
-import jcmsim.activities.ActWspActOpDispatch;
 
 public class EvAgExtActRequest extends ECEvent {
 

@@ -1,6 +1,7 @@
 package jason.stdlib;
 
 import jason.JasonException;
+import jason.asSemantics.ActionExec;
 import jason.asSemantics.Agent;
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.Intention;
@@ -15,6 +16,11 @@ import jason.asSyntax.StringTerm;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
 import jason.asSyntax.VarTerm;
+import jcmsim.CausalLink;
+import jcmsim.ExecutionController;
+import jcmsim.events.EvAgExtActRequest;
+import jcmsim.events.EvAgIntActSendMsg;
+import jcmsim.events.EvWspActDispatch;
 
 import java.util.concurrent.TimeUnit;
 
@@ -239,6 +245,11 @@ public class send extends DefaultInternalAction {
         if (rec.equals("self"))
             rec = ts.getUserAgArch().getAgName();
         m.setReceiver(rec);
+        
+        /* @SIMU */
+        ExecutionController contr = ExecutionController.getExecController();
+        contr.notifyEventExec(ts.getUserAgArch().getAgName(), new EvAgIntActSendMsg(m));             
+
         ts.getUserAgArch().sendMsg(m);
     }
 

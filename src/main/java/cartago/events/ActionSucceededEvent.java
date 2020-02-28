@@ -44,4 +44,11 @@ public class ActionSucceededEvent extends CartagoActionEvent {
     public ArtifactId getArtifactId(){
         return artifactId;
     }
+
+    
+    public String toString(){
+        return "[action-succeeded - op: "+this.getOp() + " id: " +getId()+" ]";
+        //return signal.toString();
+    }
+
 }

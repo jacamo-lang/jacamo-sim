@@ -55,6 +55,8 @@ import jason.runtime.RuntimeServices;
 import jason.runtime.Settings;
 import jason.runtime.SourcePath;
 import jason.util.Config;
+import jcmsim.ExecutionController;
+import jcmsim.ExecContext.ECType;
 
 /**
  * Runs MASProject using centralised infrastructure.
@@ -203,7 +205,12 @@ public class RunCentralisedMAS extends BaseCentralisedMAS implements RunCentrali
 
     /** create environment, agents, controller */
     protected void create() throws JasonException {
-        createEnvironment();
+
+        /* @SIMU */
+        ExecutionController contr = ExecutionController.getExecController();
+        contr.notifyNewExecContext("comm", ECType.COMM, System.currentTimeMillis());
+        
+    	createEnvironment();
         createAgs();
         createController();
     }

@@ -140,7 +140,17 @@ public class ArtifactDescriptor {
                 try {
                     IEventFilter filter = obs.getFilter();
                     if (filter == null){
-                        obs.getListener().notifyCartagoEvent(ev);
+                       
+                    	/* @SIMU */                                    
+                        ArtifactObsEvent ev1 = (ArtifactObsEvent) ev;
+                        ExecutionController contr = ExecutionController.getExecController();
+                        ECEvent causingEv = new EvArtObsStateEvent(ev1);
+                        contr.notifyEventExec(((ArtifactObsEvent) ev).getArtifactId().getName(), causingEv);
+                        ECEvent causedEv = new EvWspObsStateDispatch(ev1, obs.getAgentId());
+                        causedEv.setCausingEvent(new CausalLink(causingEv, ((ArtifactObsEvent) ev).getArtifactId().getName()));
+                        contr.notifyEventExec(ev1.getArtifactId().getWorkspaceId().getName(), causedEv);
+
+                    	obs.getListener().notifyCartagoEvent(ev);
                     } else {
                         try {
                             if (ev instanceof ArtifactObsEvent){

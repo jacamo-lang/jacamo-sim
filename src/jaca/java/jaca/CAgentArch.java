@@ -464,7 +464,8 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
 
         try {
 
-            contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+            // contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+            contr.notifyEventExec(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
             
             CartagoEvent evt = envSession.fetchNextPercept();
 
@@ -509,7 +510,8 @@ public class CAgentArch extends AgArch implements cartago.ICartagoListener {
                 
                 // next to perceive
                 
-                contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+                // contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
+                contr.notifyEventExec(this.getAgName(), new jcmsim.events.EvAgFetchPercept(this.getCycleNumber()));                    
                 
                 evt = envSession.fetchNextPercept();
             }

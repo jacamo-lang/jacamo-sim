@@ -1,5 +1,7 @@
 package jcmsim;
 
+import java.util.Iterator;
+
 /* MAIN SIMULATION LOOP */
 
 class SimulationLoop extends Thread {
@@ -10,23 +12,43 @@ class SimulationLoop extends Thread {
 		this.cntr = cntr;
 	}
     
-	public void run() {     
+	public void run() {  
+		
+        log("started.");
+		Iterator it = cntr.getContextInterator();
+		boolean block = true;
         while (true) {
             try {
 
-            	cntr.waitForAllControlFlowsBlocked();
-                
+            	if (block) {
+            		// log("waiting all blocked...");
+            		cntr.waitForAllControlFlowsBlocked();
+            	}
+            	
+                // log("all blocked => going to select events to exec");
                 /* for each execution context select and exec an event from FES and update simulated time */
                 
-                for (ExecContext ec: cntr.getExecContexts()) {
-                    
-                    PendingECEvent pev = ec.selectEventAndAdvanceTime();
-                
-                    /* exec selected event */
-                    
+            	if (!it.hasNext()) {
+            		it = cntr.getContextInterator();
+            	}
+            	
+            	if (it.hasNext()) {
+            		ExecContext ec = (ExecContext) it.next();
+            		
+                	PendingECEvent pev = ec.selectEventAndAdvanceTime();
                     if (pev != null) {
+                        /* exec selected event */
+                    	cntr.notifyTimeUpdated(ec);
+                    	
+                        // log("for " + ec.getId() + " => " + pev.getEvent().getName() + " - time " + ec.getCurrentTimeInMicroSec());
                         pev.signalExecution();
+                        block = true;
+                    } else {
+                    	block = false;
                     }
+                } else {
+                	log("waiting exec contexts...");
+                	sleep(100);
                 }
 
             } catch (Exception ex) {

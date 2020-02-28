@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import jcmsim.events.EvAgExtActRequest;
+import jcmsim.events.EvAgFetchPercept;
+import jcmsim.events.EvAgNewPerceptNotified;
 
 public class ExecContext {
     
@@ -18,11 +20,13 @@ public class ExecContext {
     
     private int oldestPendingActivityIndex;
     
-    public enum ECType { AGENT, ARTIFACT, WORKSPACE };
+    public enum ECType { AGENT, ARTIFACT, WORKSPACE, COMM };
     private ECType type;
     //public enum 
     
     private List<PendingECEvent> fes;
+    private List<PendingECEvent> fees;
+    private List<String> fesHistory;
     
     public ExecContext(String id, ECType type, long startTime) {
         this.id = id;
@@ -30,6 +34,8 @@ public class ExecContext {
         this.currentTime = startTime;
         eventHistory = new ArrayList<ECEvent>();
         fes = new ArrayList<PendingECEvent>();
+        fees = new ArrayList<PendingECEvent>();
+        fesHistory = new ArrayList<String>();
         activityHistory = new ArrayList<ECActivity>();
         oldestPendingActivityIndex = -1;
     }
@@ -85,7 +91,13 @@ public class ExecContext {
     	return null;
 	}
 
-        
+    
+    /* API */
+    
+    public void waitFor(long dt) {
+    	
+    }
+    
     /* this is about notifying event execution */
     
 
@@ -98,52 +110,46 @@ public class ExecContext {
         long currentTime = System.currentTimeMillis();
         long currentTimeMicro = System.nanoTime() / 1000;
         ev.setTime(currentTime, currentTimeMicro);  
+        
+        /* advance  time to event one */
 
+        this.currentTimeMicro = ev.getTimeInMicroSec();
+        this.currentTime = ev.getTime();
+        
         /* notify event execution */
         
         trackEventExecution(ev);
-        
-        /* advance  time to event one */
-        
-        this.currentTimeMicro = ev.getTimeInMicroSec();
-        this.currentTime = ev.getTime();
-        
     }
     
-    public synchronized void notifyEventExecution(ECEvent ev, Simulation sim) {
-
-        bindEvent(ev);
-
-        /* in simulation mode, first the event/activity structures
-    	 * are updated, then the time can be assigned
-    	 */
-
-        trackEventExecution(ev);
-
-        if (!ev.isTimeAssigned()){
-			sim.assignTime(ev, this);            	
-		} 
-        
-        /* advance  time of the EC */
-        
-        this.currentTimeMicro = ev.getTimeInMicroSec();
-        this.currentTime = ev.getTime();
-    }
+   
+    /* for internal events */
     
     public synchronized PendingECEvent scheduleEventExecution(ECEvent ev, Simulation sim) {
     	
         bindEvent(ev);
         
         if (!ev.isTimeAssigned()){
-        	sim.assignTime(ev, this);            	
-    	} else {
-            currentTimeMicro = ev.getTimeInMicroSec();
-            currentTime = ev.getTime();
+        	sim.assignTimeToScheduledEvent(ev, this);            	
     	}
 
         PendingECEvent pe = new PendingECEvent(ev);
         fes.add(pe);
+        fesHistory.add("added " + ev.getName() + " at " + this.currentTimeMicro + " by " + Thread.currentThread().getName());
         // log("scheduled " + ev);
+        return pe;
+    }
+    
+    /* for external events */
+    public synchronized PendingECEvent scheduleExtEventExecution(ECEvent ev, Simulation sim) {
+    	
+        bindEvent(ev);
+        
+        if (!ev.isTimeAssigned()){
+        	sim.assignTimeToScheduledEvent(ev, this);            	
+    	}
+
+        PendingECEvent pe = new PendingECEvent(ev);
+        fees.add(pe);
         return pe;
     }
     
@@ -207,27 +213,80 @@ public class ExecContext {
         long min = Long.MAX_VALUE;
         PendingECEvent sel = null;
         for (PendingECEvent pe: fes) {
-            if (pe.getEvent().getTime() < min) {
+            if (pe.getEvent().getTimeInMicroSec() < min) {
                 min = pe.getEvent().getTimeInMicroSec();
                 sel = pe;   
             }
         }
         
+        /* check with external future events */
+        PendingECEvent extsel = getNearestExtECEvent();
+        if (extsel != null) {
+        	if (sel != null) {
+        		if (extsel.getEvent().getTimeInMicroSec() < sel.getEvent().getTimeInMicroSec()) {
+        			fees.remove(extsel);
+                    ECEvent ev = extsel.getEvent();
+
+                    if (currentTimeMicro > ev.getTimeInMicroSec()) {
+                    	ev.setTime(this.currentTime, this.currentTimeMicro);
+                    } else {
+        	            this.currentTimeMicro = ev.getTimeInMicroSec();
+        	            this.currentTime = ev.getTime();
+                    }
+
+                    /* execute event */
+                    trackEventExecution(ev);
+                    return extsel;
+        		}
+        	} else {
+        		if (extsel.getEvent().getTimeInMicroSec() <= this.currentTimeMicro) {
+        			fees.remove(extsel);
+                    ECEvent ev = extsel.getEvent();
+                    ev.setTime(this.currentTime, this.currentTimeMicro);
+
+                    /* execute event */
+                    trackEventExecution(ev);
+                    return extsel;
+        			
+        		}
+        	}
+        }
+        
         if (sel != null) {
             fes.remove(sel);
+            fesHistory.add("removed " + sel.getEvent() + " at " + this.currentTimeMicro);
 
-            /* execute event */
-            trackEventExecution(sel.getEvent());
+            ECEvent ev = sel.getEvent();
 
-            /* advance  time of the EC */
+            if (currentTimeMicro > ev.getTimeInMicroSec()) {
+            	// log("BUG: ROLLING BACK TIME - EVENT IN THE PAST "  + ev.getName());
+            	ev.setTime(this.currentTime, this.currentTimeMicro);
+            } else {
+	        	/* advance  time of the EC */
+            	
+	            this.currentTimeMicro = ev.getTimeInMicroSec();
+	            this.currentTime = ev.getTime();
+	            
+            }
             
-            this.currentTimeMicro = sel.getEvent().getTimeInMicroSec();
-            this.currentTime = sel.getEvent().getTime();
-                 
+            /* execute event */
+            trackEventExecution(ev);
         }
         return sel;
     }
     
+    private PendingECEvent getNearestExtECEvent() {
+        long min = Long.MAX_VALUE;
+        PendingECEvent sel = null;
+        for (PendingECEvent pe: fees) {
+            if (pe.getEvent().getTimeInMicroSec() < min) {
+                min = pe.getEvent().getTimeInMicroSec();
+                sel = pe;   
+            }
+        }
+        return sel;
+    }
+
     private void log(String msg) {
         System.out.println("[EC " + this.getId() +"] " + msg);
     }

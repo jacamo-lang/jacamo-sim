@@ -35,21 +35,25 @@ public class ExecControllerLogger extends Thread {
                     StringBuffer sbReport = new StringBuffer();
                     
                     for (ExecContext ec: contr.getContexts()) {
-                        sbEvents.append("------------------------------------\n");
-                        sbEvents.append( ec.getType() + ": " + ec.getId() + "\n\n");
+                    	long te0 = 0;
+                    	sbEvents.append("------------------------------------\n");
+                        List<ECEvent> h2 = ec.getEventHistory();
+                        if (h2.size() > 0) {
+                        	te0 = h2.get(0).getTime();
+                        }
+                        sbEvents.append( ec.getType() + ": " + ec.getId() + " - start time: " + te0 + "\n\n");
+                        sbEvents.append("\nEvents: \n");
+                        for (ECEvent e: h2) {
+                            String msg = "[" + (e.getTime() - te0)+"] " + e;
+                            sbEvents.append(msg + "\n");
+                        }
                         sbEvents.append("Activities: \n");
                         List<ECActivity> h1 = ec.getActivityHistory();
                         for (ECActivity act: h1) {
                             if (!act.isPending()) {
-                                String msg = "[" + act.getBeginEvent().getTime()+"] " + act + " duration: " + act.getDuration() + " ms ( " + act.getDurationInMicroSec() + " us )";
+                                String msg = "[" + (act.getBeginEvent().getTime() - te0) +"] " + act + " duration: " + act.getDuration() + " ms ( " + act.getDurationInMicroSec() + " us )";
                                 sbEvents.append(msg + "\n");
                             }
-                        }
-                        sbEvents.append("\nEvents: \n");
-                        List<ECEvent> h2 = ec.getEventHistory();
-                        for (ECEvent e: h2) {
-                            String msg = "[" + e.getTime()+"] " + e;
-                            sbEvents.append(msg + "\n");
                         }
                         sbEvents.append("------------------------------------\n");
                         

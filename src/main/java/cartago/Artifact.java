@@ -337,7 +337,12 @@ public abstract class Artifact {
         
         ICartagoLoggerManager log = wsp.getLoggerManager();
         try {
-            lock.lock();
+        	// log("thread: " + Thread.currentThread().getName() + " executing " + info.getOperation() + " before lock");
+        	contr.notifyECControlFlowNotWorking(Thread.currentThread());
+        	lock.lock();
+        	contr.notifyECControlFlowResumedWorking(Thread.currentThread());
+        	// log("thread: " + Thread.currentThread().getName() + " executing " + info.getOperation() + " after lock");
+
             Op op = info.getOperation();
             // log("inside doOperation "+op.getName()+" "+info.getAgentBodyId().getAgentName());
             String name = op.getName();
@@ -423,6 +428,7 @@ public abstract class Artifact {
                 
                 try {
                     try {
+                    	// log("thread: " + Thread.currentThread().getName() + " executing " + info.getOperation());
                         opBody.exec(params);
                         commitObsStateChanges();
                     } catch (InvocationTargetException ex) {
@@ -547,7 +553,8 @@ public abstract class Artifact {
         } finally {
             guards.signalAll();
             lock.unlock();
-        }
+        	// log("thread: " + Thread.currentThread().getName() + " executing " + info.getOperation() + " unlocked");
+       }
     }   
     
     private void restoreOpExecContext(OpId id){
@@ -575,7 +582,7 @@ public abstract class Artifact {
         try {
             if (changed != null || added != null || removed != null){
                 wsp.notifyObsEvent(id, null, changed, added, removed);
-                guards.signalAll();
+            	guards.signalAll();
             }
         } catch (Exception ex){
             ex.printStackTrace();

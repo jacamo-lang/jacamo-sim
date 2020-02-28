@@ -1097,7 +1097,8 @@ public class Workspace {
                     
                     ECEvent eventToExec = new EvArtOpEnqueued(info);
                     eventToExec.setCausingEvent(new CausalLink(wspEv, this.id.toString()));
-                    contr.readyToExecEvent(aid.getName(), eventToExec);
+                    //contr.readyToExecEvent(aid.getName(), eventToExec);
+                	contr.notifyEventExec(aid.getName(), eventToExec);
                                         
                     opTodo.put(info);
                     
@@ -1900,11 +1901,14 @@ public class Workspace {
                     OpExecutionFrame item = opBuffer.take();  
                     
                     /* @SIMU */
+                    // log("env controller " + Thread.currentThread().getName() + " unblocked to exec " + item.getOperation());
+
                     contr.notifyECControlFlowStarted(this);
                     
                     //log("New job to do: "+item.getOpId());
                     item.setServingThread(Thread.currentThread());
                     env.serveOperation(item);
+                    // log("env controller " + Thread.currentThread().getName() + " done: " + item.getOperation());
                     //nfailures = 0;
                 } catch (Exception ex){
                     ex.printStackTrace();

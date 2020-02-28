@@ -4,9 +4,12 @@ package jcmsim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,6 +28,7 @@ public class ExecutionController  {
 
     
     private ConcurrentHashMap<String, ExecContext> ectxs;
+    private LinkedBlockingQueue<ExecContext> ectxsList;
     
     private ExecControllerLogger logger;
     private SimulationLoop simuLoop;
@@ -58,6 +62,7 @@ public class ExecutionController  {
         ectxControlFlowsState = new HashMap<String, Boolean>();
         
         ectxs = new ConcurrentHashMap<String, ExecContext> ();
+        ectxsList = new LinkedBlockingQueue<ExecContext>();
         this.mode = Mode.Normal;
     }
         
@@ -81,7 +86,7 @@ public class ExecutionController  {
     public boolean isNormalMode() {
         return mode.equals(Mode.Normal);  
     }
-
+    
     public void initSimulationMode(Simulation sim) {
         this.sim = sim;
         this.mode = Mode.Simulation;
@@ -94,7 +99,15 @@ public class ExecutionController  {
         simuLoop = new SimulationLoop(this);
         simuLoop.start();
     }
-          
+     
+    
+    public void waitFor(String ctxId, long dt) {
+    	ExecContext ctx = ectxs.get(ctxId);
+        if (ctx != null ) {
+        	
+        }
+    }
+    
     /* =============== */
 
     /* Called by JaCaMo Platform control flows */
@@ -104,6 +117,7 @@ public class ExecutionController  {
     public void notifyNewExecContext(String ctxId, ECType type, long initialTime) {
         ExecContext ctx = new ExecContext(ctxId, type, 0);
         ectxs.put(ctxId, ctx);
+        ectxsList.add(ctx);
     }
 
     public ECEvent getLastEvent(String ctxId) {
@@ -133,36 +147,47 @@ public class ExecutionController  {
 	        if (ctx != null) {
 	        	if (isTrackingMode()) {
 	        		ctx.notifyEventExecution(ev);
-	        	} else {
-	        		ctx.notifyEventExecution(ev, sim);
+	        	} else {	        		
+	        		PendingECEvent evScheduled = ctx.scheduleEventExecution(ev, sim);
+	            	/* before releasing the control, wait for the event to be scheduled */
+	                try {
+	                    this.notifyECControlFlowWaiting(Thread.currentThread());
+	                    // log(Thread.currentThread().getName() + " - wait for sched: " + evScheduled.getEvent().getName() + " in " + ctx.getId());
+	                    evScheduled.waitForSched();             
+	                    // log(Thread.currentThread().getName() + " - signaled for exec of " + pev.getEvent());
+	                    this.notifyECControlFlowRunning(Thread.currentThread());
+	                } catch (Exception ex) {
+	                    ex.printStackTrace();
+	                }
+	        	
 	        	}		
 	        }
     	}   		
     }
 
-    /* used to schedule events */
-    
-    public void readyToExecEvent(String ctxId, ECEvent ev) {
-    	if (isSimulationMode()) {
-       		/* in simulation mode, this is about scheduling the event exec */
-    		
+    public void notifyEventFromExternalCtx(String ctxId, ECEvent ev) {  
+    	if (!isNormalMode()) {    		
             ExecContext ctx = ectxs.get(ctxId);
-            if (ctx != null) {
-            	PendingECEvent evScheduled = ctx.scheduleEventExecution(ev, sim);
-            	/* before releasing the control, wait for the event to be scheduled */
-                try {
-                    this.notifyECControlFlowWaiting(Thread.currentThread());
-                    // log(Thread.currentThread().getName() + " - wait for exec of " + pev.getEvent());
-                    evScheduled.waitForSched();             
-                    // log(Thread.currentThread().getName() + " - signaled for exec of " + pev.getEvent());
-                    this.notifyECControlFlowRunning(Thread.currentThread());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-    	} 
+	        if (ctx != null) {
+	        	if (isTrackingMode()) {
+	        		ctx.notifyEventExecution(ev);
+	        	} else {	        		
+	        		PendingECEvent evScheduled = ctx.scheduleExtEventExecution(ev, sim);
+	            	/* before releasing the control, wait for the event to be scheduled */
+	                try {
+	                    this.notifyECControlFlowWaiting(Thread.currentThread());
+	                    // log(Thread.currentThread().getName() + " - wait for sched: " + evScheduled.getEvent().getName() + " in " + ctx.getId());
+	                    evScheduled.waitForSched();             
+	                    // log(Thread.currentThread().getName() + " - signaled for exec of " + pev.getEvent());
+	                    this.notifyECControlFlowRunning(Thread.currentThread());
+	                } catch (Exception ex) {
+	                    ex.printStackTrace();
+	                }
+	        	
+	        	}		
+	        }
+    	}   		
     }
-    
     
     
     public void notifyECControlFlowStarted(Thread t) {
@@ -174,6 +199,20 @@ public class ExecutionController  {
         ectxControlFlowsLock.unlock();
     }
 
+    public void notifyECControlFlowNotWorking(Thread t) {
+        ectxControlFlowsLock.lock();
+        // log("active worker " + t.getName() + " no  working");
+        ectxControlFlowsState.put(t.getName(), false);
+        ectxControlFlowsLock.unlock();
+    }
+
+    public void notifyECControlFlowResumedWorking(Thread t) {
+        ectxControlFlowsLock.lock();
+        // log("active worker " + t.getName() + " resumed working");
+        ectxControlFlowsState.put(t.getName(), true);
+        ectxControlFlowsLock.unlock();
+    }
+    
     public void notifyECControlFlowFinished(Thread t) {
         ectxControlFlowsLock.lock();
         // log("active worker " + t.getName() + " stopped working");
@@ -199,6 +238,8 @@ public class ExecutionController  {
         ectxControlFlowsLock.unlock();
     }    
      
+    /* called by the simulator loop */
+    
     public void waitForAllControlFlowsBlocked() throws InterruptedException  {
         /* wait current EC control flows to complete current event execution */
         
@@ -207,7 +248,7 @@ public class ExecutionController  {
         boolean allBlocked = false;
         while (!allBlocked) {
             allBlocked = true;
-            // log("checking for active workers - " + activeWorkerState.size());
+            // log("checking for active workers - " + ectxControlFlowsState.size());
             for (Entry<String, Boolean> t: ectxControlFlowsState.entrySet()) {
                 if (t.getValue()) {
                     // log("worker " + t.getKey() + " not blocked ");
@@ -217,17 +258,28 @@ public class ExecutionController  {
             }
             if (!allBlocked) {
                 ectxControlFlowsStateUpdated.await();
+                // log("signaled.");
             } 
         }
         ectxControlFlowsLock.unlock();
     }
+    
+    public Iterator getContextInterator() {
+    	return ectxsList.iterator();
+    }
    
+    public void notifyTimeUpdated(ExecContext ctx) {
+    	if (sim != null) {
+    		sim.notifyTimeUpdated(ctx);
+    	}
+    }
     
     /* called by timing functions */
     
     public Collection<ExecContext> getExecContexts(){
     	return ectxs.values();
     }
+
     
     public ExecContext getExecContext(String id){
     	return ectxs.get(id);

@@ -29,7 +29,7 @@ public class Simulation {
     }     
     
 
-    public void assignTime(ECEvent ev, ExecContext ctx) {
+    void assignTimeToScheduledEvent(ECEvent ev, ExecContext ctx) {
     	
     	boolean assigned = false;
     	List<ECActivity> acts = ev.getEndingActivities();
@@ -52,9 +52,17 @@ public class Simulation {
     			long t = timeHandler.computeTime(ev, ctx);
     			ev.setTime(t/1000, t);
     		} else {
-    			ev.setTime(ctx.getCurrentTime(), ctx.getCurrentTimeInMicroSec());
+    			assignTime(ev, ctx);
     		}
     	}
     }
 
+    /* default */
+    
+    public void assignTime(ECEvent ev, ExecContext ctx) {
+		ev.setTime(ctx.getCurrentTime(), ctx.getCurrentTimeInMicroSec());
+    }
+
+    public void notifyTimeUpdated(ExecContext ctx) {
+    }
 }

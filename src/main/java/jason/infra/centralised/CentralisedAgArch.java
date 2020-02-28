@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import cartago.CartagoEvent;
+import cartago.events.CartagoActionEvent;
 import jason.JasonException;
 import jason.ReceiverNotFoundException;
 import jason.architecture.AgArch;
@@ -23,6 +25,17 @@ import jason.runtime.RuntimeServices;
 import jason.runtime.Settings;
 import jason.util.Config;
 import jcmsim.ExecContext.ECType;
+import jcmsim.events.EvAgExtActRequest;
+import jcmsim.events.EvAgIntActSendMsg;
+import jcmsim.events.EvAgNewMsgNotified;
+import jcmsim.events.EvAgNewMsgReceived;
+import jcmsim.events.EvArtOpEnqueued;
+import jcmsim.events.EvCommReceiveMsgDispatch;
+import jcmsim.events.EvCommSendMsgDispatch;
+import jcmsim.events.EvWspActDispatch;
+import jcmsim.events.EvWspNewOpToExec;
+import jcmsim.CausalLink;
+import jcmsim.ECEvent;
 import jcmsim.ExecutionController;
 
 /**
@@ -262,6 +275,7 @@ public class CentralisedAgArch extends AgArch implements Runnable {
 
     private Object sleepSync = new Object();
     private int    sleepTime = 50;
+	private Object credential;
 
     public static final int MAX_SLEEP = 1000;
 
@@ -327,6 +341,16 @@ public class CentralisedAgArch extends AgArch implements Runnable {
             else
                 return;
         }
+        
+        
+        /* @SIMU */
+        ExecutionController contr = ExecutionController.getExecController();
+        EvAgIntActSendMsg ev = (EvAgIntActSendMsg) contr.getLastEvent(this.getAgName());
+        EvCommSendMsgDispatch evc = new EvCommSendMsgDispatch(ev.getMessage());
+        ev.setCausedEvent(evc);
+        evc.setCausingEvent(new CausalLink(ev,this.getAgName()));
+        contr.notifyEventExec("comm", evc);              
+        
         rec.receiveMsg(m.clone()); // send a cloned message
 
         // notify listeners
@@ -336,6 +360,20 @@ public class CentralisedAgArch extends AgArch implements Runnable {
     }
 
     public void receiveMsg(Message m) {
+    	
+        /*
+         * @SIMU
+         */
+        ExecutionController contr = ExecutionController.getExecController();
+        ECEvent commEv = new EvCommReceiveMsgDispatch(m);        
+        contr.notifyEventExec("comm", commEv);
+        
+        ECEvent eventToExec = new EvAgNewMsgNotified(m);
+        eventToExec.setCausingEvent(new CausalLink(commEv, "comm"));
+        // contr.readyToExecEvent(this.getAgName(), eventToExec);
+        contr.notifyEventFromExternalCtx(this.getAgName(), eventToExec);
+  
+        
         mbox.offer(m);
         wakeUpSense();
     }
@@ -352,10 +390,25 @@ public class CentralisedAgArch extends AgArch implements Runnable {
     // Default procedure for checking messages, move message from local mbox to C.mbox
     public void checkMail() {
         Circumstance C = getTS().getC();
+
+        /* @SIMU */
+        ExecutionController contr = ExecutionController.getExecController();
+        // contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgCheckMail(this.getCycleNumber()));                    
+        contr.notifyEventExec(this.getAgName(), new jcmsim.events.EvAgCheckMail(this.getCycleNumber()));                    
+        
         Message im = mbox.poll();
         while (im != null) {
-            C.addMsg(im);
+
+        	// @SIMU
+        	EvAgNewMsgReceived ev = new jcmsim.events.EvAgNewMsgReceived(im);
+            contr.notifyEventExec(this.getAgName(), ev);                       
+        	
+        	C.addMsg(im);
             if (logger.isLoggable(Level.FINE)) logger.fine("received message: " + im);
+
+            // contr.readyToExecEvent(this.getAgName(), new jcmsim.events.EvAgCheckMail(this.getCycleNumber()));                    
+            contr.notifyEventExec(this.getAgName(), new jcmsim.events.EvAgCheckMail(this.getCycleNumber()));                    
+            
             im = mbox.poll();
         }
     }
